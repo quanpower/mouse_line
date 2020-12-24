@@ -20,11 +20,11 @@ async def main():
     # setup our server
     server = Server()
     await server.init()
-    server.set_endpoint('opc.tcp://0.0.0.0:4840/freeopcua/server/')
+    server.set_endpoint('opc.tcp://172.16.6.250:5616/agv/server/')
 
-    # setup our own namespace, not really necessary but should as spec
-    uri = 'http://examples.freeopcua.github.io'
-    idx = await server.register_namespace(uri)
+    # # setup our own namespace, not really necessary but should as spec
+    # uri = 'http://examples.freeopcua.github.io'
+    # idx = await server.register_namespace(uri)
 
     # populating our address space
     # server.nodes, contains links to very common nodes like objects and root
