@@ -41,3 +41,5 @@ npm install yarn -g
 yarn全局安装命令需要配置环境变量，将 yarn global bin 的地址配置到用户变量内
 
 yarn global add @quasar/cli
+
+git rm wms/db.sqlite3 --cached
