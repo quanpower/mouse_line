@@ -294,7 +294,8 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
 
                         model = datalist[0]
                         color = datalist[1]
-                        quantity = datalist[2]
+                        no = datalist[2]
+
 
                         if model == 'A':
                             warehouse = materials_position['A']
@@ -316,16 +317,73 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
                         else:
                             out_list = []
 
-                        out_list = [3,7,13,19]
+                        out_list = [7,13,19,3]
                         # out_list = [7,13,19]
+                        out_lists = [
+                            [
+                            {'position':7,
+                            'no':1,
+                            'quantity':6
+                            },
+                            {'position':13,
+                            'no':1,
+                            'quantity':6
+                            },
+                            {'position':19,
+                            'no':1,
+                            'quantity':6
+                            },
+                            {'position':3,
+                            'no':1,
+                            'quantity':6
+                            } 
+                        ],[
+                            {'position':7,
+                            'no':2,
+                            'quantity':5
+                            },
+                            {'position':13,
+                            'no':2,
+                            'quantity':5
+                            },
+                            {'position':19,
+                            'no':2,
+                            'quantity':5
+                            },
+                            {'position':3,
+                            'no':2,
+                            'quantity':5
+                            } 
+                        ],[
+                            {'position':7,
+                            'no':3,
+                            'quantity':4
+                            },
+                            {'position':13,
+                            'no':3,
+                            'quantity':4
+                            },
+                            {'position':19,
+                            'no':3,
+                            'quantity':4
+                            },
+                            {'position':3,
+                            'no':3,
+                            'quantity':4
+                            } 
+                        ],
+                        ],
+                        out_list = out_lists[int(no)]
                         print(out_list)
 
                         positionByte = 6
+                        noByte = 94
+                        quantityByte = 96
                         enableByte = 4
                         enableBit = 0
                         enable = 1
                         if out_list:
-                            thread_out = threading.Thread(name="thread_out", target=out_action, args=(siemens_1500, positionByte, enableByte, enableBit, enable,out_list, glock))
+                            thread_out = threading.Thread(name="thread_out", target=out_action, args=(siemens_1500, positionByte,noByte,quantityByte, enableByte, enableBit, enable,out_list, glock))
                             thread_out.start()
 
                     elif 'trigger2' == data_tuple[0]:
