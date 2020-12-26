@@ -17,9 +17,13 @@ def login(request, *args, **kwargs):
         "name": post_data.get('name'),
         "password": post_data.get('password'),
     }
+    print('=====login====')
+
+    print(data)
     ip = request.META.get('HTTP_X_FORWARDED_FOR') if request.META.get(
         'HTTP_X_FORWARDED_FOR') else request.META.get('REMOTE_ADDR')
     if User.objects.filter(username=str(data['name'])).exists():
+        print('=====login====')
         user = auth.authenticate(username=str(data['name']), password=str(data['password']))
         if user is None:
             err_ret = FBMsg.err_ret()

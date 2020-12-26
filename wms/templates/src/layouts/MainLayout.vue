@@ -612,6 +612,9 @@ export default {
               })
             }
           }).catch(err => {
+            console.log('admin login error!')
+            console.log(err.detail)
+            
             _this.$q.notify({
               message: err.detail,
               icon: 'close',

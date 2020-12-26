@@ -317,7 +317,7 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
                         else:
                             out_list = []
 
-                        out_list = [7,13,19,3]
+                        # out_list = [7,13,19,3]
                         # out_list = [7,13,19]
                         out_lists = [
                             [
@@ -373,7 +373,9 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
                             } 
                         ],
                         ],
-                        out_list = out_lists[int(no)]
+                        print(no)
+                        out_list = out_lists[0][int(no)-1]
+                        print(out_lists)
                         print(out_list)
 
                         positionByte = 6
