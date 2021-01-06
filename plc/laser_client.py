@@ -1,7 +1,7 @@
 import socket
 import sys
 
-HOST, PORT = "172.16.6.251", 6000
+HOST, PORT = "172.16.6.250", 6000
 
 
 def client_send(data):
