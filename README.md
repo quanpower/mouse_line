@@ -43,3 +43,7 @@ yarn全局安装命令需要配置环境变量，将 yarn global bin 的地址�
 yarn global add @quasar/cli
 
 git rm wms/db.sqlite3 --cached
+
+
+openid:
+b1dba4ebed6fc32e077dd1fb180b7cfd
