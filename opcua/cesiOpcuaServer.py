@@ -28,7 +28,7 @@ async def main():
     await new_struct(server, idx, "AGV", [
         new_struct_field("orderNo", ua.VariantType.String),
         new_struct_field("position", ua.VariantType.Int32),
-        new_struct_field("speed", ua.VariantType.Float, optional=True),
+        new_struct_field("speed", ua.VariantType.Float),
         new_struct_field("running", ua.VariantType.Int32),
     ])
 
@@ -36,21 +36,63 @@ async def main():
     await server.load_data_type_definitions()
 
     order_1 = ua.Order()
-    order_1.orderNo = 'PP000157'
+    order_1.orderNo = 'PP000151'
     order_1.productNo = 'A01'
     order_1.state = 1
     order_1.duration = 35.6
 
+    order_2 = ua.Order()
+    order_2.orderNo = 'PP000152'
+    order_2.productNo = 'A01'
+    order_2.state = 1
+    order_2.duration = 35.6
+
+    order_3 = ua.Order()
+    order_3.orderNo = 'PP000153'
+    order_3.productNo = 'A01'
+    order_3.state = 1
+    order_3.duration = 35.6
+
+    order_4 = ua.Order()
+    order_4.orderNo = 'PP000154'
+    order_4.productNo = 'A01'
+    order_4.state = 1
+    order_4.duration = 35.6
+
+    order_5 = ua.Order()
+    order_5.orderNo = 'PP000155'
+    order_5.productNo = 'A01'
+    order_5.state = 1
+    order_5.duration = 35.6
+
+    order_6 = ua.Order()
+    order_6.orderNo = 'PP000156'
+    order_6.productNo = 'A01'
+    order_6.state = 1
+    order_6.duration = 35.6        
+
+    order_7 = ua.Order()
+    order_7.orderNo = 'PP000157'
+    order_7.productNo = 'A01'
+    order_7.state = 1
+    order_7.duration = 35.6              
 
     await server.nodes.objects.add_variable(idx, "order_1", ua.Variant(order_1, ua.VariantType.ExtensionObject))
+    await server.nodes.objects.add_variable(idx, "order_2", ua.Variant(order_2, ua.VariantType.ExtensionObject))
+    await server.nodes.objects.add_variable(idx, "order_3", ua.Variant(order_3, ua.VariantType.ExtensionObject))
+    await server.nodes.objects.add_variable(idx, "order_4", ua.Variant(order_4, ua.VariantType.ExtensionObject))
+    await server.nodes.objects.add_variable(idx, "order_5", ua.Variant(order_5, ua.VariantType.ExtensionObject))
+    await server.nodes.objects.add_variable(idx, "order_6", ua.Variant(order_6, ua.VariantType.ExtensionObject))
+    await server.nodes.objects.add_variable(idx, "order_7", ua.Variant(order_7, ua.VariantType.ExtensionObject))
     
-    await server.nodes.objects.add_variable(idx, "order_2", ua.Variant(ua.Order(), ua.VariantType.ExtensionObject))
-    await server.nodes.objects.add_variable(idx, "order_3", ua.Variant(ua.Order(), ua.VariantType.ExtensionObject))
-    await server.nodes.objects.add_variable(idx, "order_4", ua.Variant(ua.Order(), ua.VariantType.ExtensionObject))
-    await server.nodes.objects.add_variable(idx, "order_5", ua.Variant(ua.Order(), ua.VariantType.ExtensionObject))
-    await server.nodes.objects.add_variable(idx, "order_6", ua.Variant(ua.Order(), ua.VariantType.ExtensionObject))
-    await server.nodes.objects.add_variable(idx, "order_7", ua.Variant(ua.Order(), ua.VariantType.ExtensionObject))
-    
+    # await server.nodes.objects.add_variable(idx, "order_2", ua.Variant(ua.Order(), ua.VariantType.ExtensionObject))
+    # await server.nodes.objects.add_variable(idx, "order_3", ua.Variant(ua.Order(), ua.VariantType.ExtensionObject))
+    # await server.nodes.objects.add_variable(idx, "order_4", ua.Variant(ua.Order(), ua.VariantType.ExtensionObject))
+    # await server.nodes.objects.add_variable(idx, "order_5", ua.Variant(ua.Order(), ua.VariantType.ExtensionObject))
+    # await server.nodes.objects.add_variable(idx, "order_6", ua.Variant(ua.Order(), ua.VariantType.ExtensionObject))
+    # await server.nodes.objects.add_variable(idx, "order_7", ua.Variant(ua.Order(), ua.VariantType.ExtensionObject))
+
+
     agv = ua.AGV()
     agv.orderNo = 'PP000157'
     agv.position = 5
