@@ -301,7 +301,7 @@ for i in return_data:
     seq_list.append(i['seq'])
 
 
-seq_list_str = ','.join(seq) for seq in seq_list
+seq_list_str = ','.join(seq_list)
 
 print(seq_list_str)
 
