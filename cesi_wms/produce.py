@@ -287,8 +287,9 @@ print(return_json)
 	"message":"操作成功!"
 }'''
 
-
-return_dict = json.loads(return_json)
+print(type(return_json))
+# return_dict = json.loads(return_json)
+return_dict = return_json
 
 print(return_dict)
 
