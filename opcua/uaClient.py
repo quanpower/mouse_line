@@ -9,7 +9,7 @@ _logger = logging.getLogger('asyncua')
 
 
 async def main():
-    url = 'opc.tcp://172.16.6.250:5616/agv/server/'
+    url = 'opc.tcp://172.16.6.250:5616/'
     # url = 'opc.tcp://commsvr.com:51234/UA/CAS_UA_Server'
     async with Client(url=url) as client:
         # Client has a few methods to get proxy to UA nodes that should always be in address space such as Root or Objects
