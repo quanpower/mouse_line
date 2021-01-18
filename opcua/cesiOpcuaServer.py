@@ -79,13 +79,13 @@ async def main():
     order_7.state = 1
     order_7.duration = 35.6              
 
-    await server.nodes.objects.add_variable(idx, "order_1", ua.Variant(order_1, ua.VariantType.ExtensionObject))
-    await server.nodes.objects.add_variable(idx, "order_2", ua.Variant(order_2, ua.VariantType.ExtensionObject))
-    await server.nodes.objects.add_variable(idx, "order_3", ua.Variant(order_3, ua.VariantType.ExtensionObject))
-    await server.nodes.objects.add_variable(idx, "order_4", ua.Variant(order_4, ua.VariantType.ExtensionObject))
-    await server.nodes.objects.add_variable(idx, "order_5", ua.Variant(order_5, ua.VariantType.ExtensionObject))
-    await server.nodes.objects.add_variable(idx, "order_6", ua.Variant(order_6, ua.VariantType.ExtensionObject))
-    await server.nodes.objects.add_variable(idx, "order_7", ua.Variant(order_7, ua.VariantType.ExtensionObject))
+    await server.nodes.objects.add_object(idx, "order_1", ua.Variant(order_1, ua.VariantType.ExtensionObject))
+    await server.nodes.objects.add_object(idx, "order_2", ua.Variant(order_2, ua.VariantType.ExtensionObject))
+    await server.nodes.objects.add_object(idx, "order_3", ua.Variant(order_3, ua.VariantType.ExtensionObject))
+    await server.nodes.objects.add_object(idx, "order_4", ua.Variant(order_4, ua.VariantType.ExtensionObject))
+    await server.nodes.objects.add_object(idx, "order_5", ua.Variant(order_5, ua.VariantType.ExtensionObject))
+    await server.nodes.objects.add_object(idx, "order_6", ua.Variant(order_6, ua.VariantType.ExtensionObject))
+    await server.nodes.objects.add_object(idx, "order_7", ua.Variant(order_7, ua.VariantType.ExtensionObject))
     
     # await server.nodes.objects.add_variable(idx, "order_2", ua.Variant(ua.Order(), ua.VariantType.ExtensionObject))
     # await server.nodes.objects.add_variable(idx, "order_3", ua.Variant(ua.Order(), ua.VariantType.ExtensionObject))
@@ -101,7 +101,7 @@ async def main():
     agv.speed = 9.99
     agv.running = 1
 
-    await server.nodes.objects.add_variable(idx, "agv", ua.Variant(agv, ua.VariantType.ExtensionObject))
+    await server.nodes.objects.add_object(idx, "agv", ua.Variant(agv, ua.VariantType.ExtensionObject))
 
     async with server:
         while True:
