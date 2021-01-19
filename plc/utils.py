@@ -166,7 +166,9 @@ def int2bitarray(int_, length):
     except  Exception as e:
         pass
         
+# def true_false_0_1(list_):
+#     return [True if i == 1 else False for i in list_]
+
+
 def true_false_0_1(list_):
-    return [True if i == 1 else False for i in list_]
-
-
+    return [1 if i == 1 else 0 for i in list_]

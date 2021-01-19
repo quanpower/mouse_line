@@ -10,6 +10,6 @@ class gloVar():
     robot_status = []
     bitArrayA = []
     bitArrayB = []
-    category = 'A'
+    category = 'B'
     quantity = 0
     ready_ok = False

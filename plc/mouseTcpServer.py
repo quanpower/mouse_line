@@ -104,6 +104,7 @@ def logger(log_obj):
 
     return logger
 
+
 def return_position(warehouse, goods, color):
     if goods == 6:
         # box
@@ -177,8 +178,6 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
                         print('===camera begin!====')
                         data = data_tuple[1]
                         print(data)
-                        # thread_laser = threading.Thread(name="thread_laser", target=client_send, args=(data,))
-                        # thread_laser.start()  
                         datalist = data_tuple[1].split(',')   
                         datalist_length = len(datalist)
                         
