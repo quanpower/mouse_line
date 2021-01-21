@@ -465,7 +465,8 @@ async def produce_test():
 @app.put("/v1/api/wms/warehouse/fake/{bin_id}")
 async def update_warehouse_bin(bin_id: int, q: Optional[str] = None):
     isEmpty = 0
-    material_code = get_material_code()
+    material_code = get_material_code(bin_id)
+
     if bin_id >= 1 and bin_id <= 6 or bin_id >= 27 and bin_id <= 32:
         materialList = generate_plate_info_json(1,7, material_code) 
     elif bin_id >= 7 and bin_id <= 24 or bin_id >= 33 and bin_id <= 50:
@@ -476,7 +477,7 @@ async def update_warehouse_bin(bin_id: int, q: Optional[str] = None):
         materialList = generate_plate_info_json(1,55, material_code) 
     else:
         print('unknown!')
-        
+
     print(materialList)
     query = warehouse.update().where(warehouse.c.id==bin_id).values(isEmpty=isEmpty, materialList=materialList)
     last_record_id = await database.execute(query)
