@@ -1,7 +1,6 @@
 import threading
 import time
 import struct
-from plc_addr import robots_addr
 from utils import int2bitarray
 import binascii
 import random
