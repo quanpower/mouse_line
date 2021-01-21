@@ -72,8 +72,8 @@ def return_locator_code(locatorList):
 
     for j in locatorList:
         index = int(j)
-        print(index)
-        print(gloVar.wssArray)
+        # print(index)
+        # print(gloVar.wssArray)
         if gloVar.wssArray[index-1]:
             return index
 
@@ -108,12 +108,12 @@ def pre_produce(order_list):
     signType = pre_produce['signType']
     signValue = pre_produce['signValue']
 
-    print(id)
-    print(productCode)
-    print(seq)
-    print(materialList)
-    print(signType)
-    print(signValue)
+    # print(id)
+    # print(productCode)
+    # print(seq)
+    # print(materialList)
+    # print(signType)
+    # print(signValue)
 
     positions = []
     for i in materialList:
@@ -122,8 +122,8 @@ def pre_produce(order_list):
         locatorList = locatorCode.split(',')
         print(locatorCode)
         print(locatorList)
-
         locatorCode = return_locator_code(locatorList)
+        print('===locatorCode===')
         print(locatorCode)
         positions.append(locatorCode)
     print('===positions===')
@@ -140,6 +140,8 @@ def pre_produce(order_list):
             warehouse_bin = return_json['data']
             print(warehouse_bin)
             material_dict = json.loads(warehouse_bin[0]['materialList'])
+            print('====material_dict===')
+            print(material_dict)
 
             for key,value in material_dict.items():
                 no = int(key)
@@ -154,7 +156,8 @@ def pre_produce(order_list):
                 'no': no,
                 'quantity': quantity
             }
-
+            print(out)
+            
             out_list.append(out)
 
     print(out_list)
