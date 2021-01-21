@@ -287,22 +287,17 @@ print(return_json)
 	"message":"操作成功!"
 }'''
 
-print(type(return_json))
-# return_dict = json.loads(return_json)
-return_dict = return_json
 
-print(return_dict)
-
-return_data = return_dict['data']
+return_data = return_json['data']
 
 print(return_data)
 
 seq_list = []
 for i in return_data:
     seq_list.append(i['seq'])
-
-
 seq_list_str = ','.join(seq_list)
 
 print(seq_list_str)
+
+return_data[0]
 
