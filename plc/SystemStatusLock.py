@@ -22,7 +22,6 @@ def query_system_status(glock):
             with glock:
                 try:
                     # print('=====robot_0======')
-                    
                     warehouse_senser_status = siemens_1500.query_block_from_plc(40,0,8)
                     wss =struct.unpack('<2I', warehouse_senser_status)
                     status_a = wss[0]
@@ -31,6 +30,10 @@ def query_system_status(glock):
                     bitArrayB = int2bitarray(status_b, 32)
                     bitArrayA.extend(bitArrayB)
                     wssArray = bitArrayA[0:52]
+
+                    robot_put_get_done_status = siemens_1500.query_block_from_plc(40,8,8)
+                    rpgds = struct.unpack('<2H', robot_put_get_done_status)
+
 
                     camera_trigger = siemens_1500.query_block_from_plc(38,0,1)
                     ct =struct.unpack('>B', camera_trigger)
@@ -76,8 +79,7 @@ def query_system_status(glock):
                         gloVar.ready_ok = ready_ok
                     if rs:
                         gloVar.robot_status = rs
-                    gloVar.bitArrayA = bitArrayA
-                    gloVar.bitArrayB = bitArrayB
+
                     gloVar.wssArray = wssArray
                     
                 except Exception as e:

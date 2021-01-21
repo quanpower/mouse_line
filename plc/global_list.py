@@ -8,8 +8,9 @@ class gloVar():
     warehouse_senser_status = []
     camera_triggers = [0,0,0,0,0,0,0,0]
     robot_status = []
-    bitArrayA = []
-    bitArrayB = []
+    wssArray = []
     category = 'B'
     quantity = 0
     ready_ok = False
+    producing = False
+

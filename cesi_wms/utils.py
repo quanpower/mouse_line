@@ -37,7 +37,48 @@ def generate_materials_list():
         {"id":27, "materialCode": "Na01.01", "materialName": "包装盒", "materialClass":"Na01", "description":"包装盒" },
     ]
     return materialsList
-  
+
+
+def generate_material_storage_init():
+    material_storage = [
+        {"id":1, "materialCode": "Za01.01", "locatorCode": "7,8"},
+        {"id":2, "materialCode": "Za01.02", "locatorCode": "9,10,11,12"},
+        {"id":3, "materialCode": "Za01.03", "locatorCode": ""},
+        {"id":4, "materialCode": "Za01.04", "locatorCode": "33,34"},
+        {"id":5, "materialCode": "Za01.05", "locatorCode": "35,36,37,38"},
+        {"id":6, "materialCode": "Za01.06", "locatorCode": ""},
+
+        {"id":7, "materialCode": "Za02.01", "locatorCode": "13,14"},
+        {"id":8, "materialCode": "Za02.02", "locatorCode": "15,16,17,18"},
+        {"id":9, "materialCode": "Za02.03", "locatorCode": ""},
+        {"id":10, "materialCode": "Za02.04", "locatorCode": "39,40"},
+        {"id":11, "materialCode": "Za02.05", "locatorCode": "41,42,43,44"},
+        {"id":12, "materialCode": "Za02.06", "locatorCode": ""},
+
+        {"id":13, "materialCode": "Za03.01", "locatorCode": "19,20"},
+        {"id":14, "materialCode": "Za03.02", "locatorCode": "21,22"},
+        {"id":15, "materialCode": "Za03.03", "locatorCode": "23,24"},
+        {"id":16, "materialCode": "Za03.04", "locatorCode": "45,46"},
+        {"id":17, "materialCode": "Za03.05", "locatorCode": "47,48"},
+        {"id":18, "materialCode": "Za03.06", "locatorCode": "49,50"},
+
+        {"id":19, "materialCode": "Ba02.01", "locatorCode": "26,52"},
+        {"id":20, "materialCode": "Ba02.02", "locatorCode": "26,52"},
+        {"id":21, "materialCode": "Ba02.03", "locatorCode": "26,52"},
+        {"id":22, "materialCode": "Ba02.04", "locatorCode": "26,52"},
+        {"id":23, "materialCode": "Ba02.05", "locatorCode": "26,52"},
+        {"id":24, "materialCode": "Ba02.06", "locatorCode": "26,52"},
+        
+        {"id":25, "materialCode": "Ba01.01", "locatorCode": "25,51"},
+        
+        {"id":26, "materialCode": "La01.01", "locatorCode": ""},
+
+        {"id":27, "materialCode": "Na01.01", "locatorCode": "1,2,3,4,5,6,27,28,29,30,31,32"},
+    ]
+
+    return material_storage
+
+
 def generate_plate_info_json(start, end, materialCode):
     temp_dict = {}
     for i in range(start, end):
