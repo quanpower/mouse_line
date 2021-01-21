@@ -1,21 +1,26 @@
 import requests
 import json
-
+import time
 from global_list import gloVar
-
-material_storage_uri = 'http://localhost:8088/v1/api/wms/material_storage'
-r = requests.get(material_storage_uri)
-return_json = r.json()
-
-material_storage = return_json['data']
-# print(material_storage)
-
-material_dict = {}
-for i in material_storage:
-    material_dict[i['materialCode']] = i['locatorCode']
-# print(material_dict)
+import operator
 
 warehouse_bin_uri = 'http://localhost:8088/v1/api/wms/warehouse/bin/'
+
+def get_material_dict():
+    material_storage_uri = 'http://localhost:8088/v1/api/wms/material_storage'
+    r = requests.get(material_storage_uri)
+    return_json = r.json()
+
+    material_storage = return_json['data']
+    # print(material_storage)
+
+    material_dict = {}
+    for i in material_storage:
+        material_dict[i['materialCode']] = i['locatorCode']
+    # print(material_dict)
+    return material_dict
+
+material_dict = get_material_dict()
 
 def return_materials_position():
 
@@ -73,7 +78,7 @@ def return_locator_code(locatorList):
         if wssArray[index-1]:
             return index
 
-def pre_produce():
+def get_order_list():
     
     global material_dict
 
@@ -83,11 +88,19 @@ def pre_produce():
     return_json = r.json()
     print(return_json)
 
-    return_data = return_json['data']
-    print(return_data)
+    order_list = return_json['data']
+    print(order_list)
+
+    sorted_order_list = sorted(order_list, key=operator.itemgetter('seq'))
+    print(sorted_order_list)
+    return sorted_order_list
+
+def pre_produce(order_list):
+    
+    global material_dict
 
     seq_list = []
-    for i in return_data:
+    for i in order_list:
         seq_list.append(i['seq'])
     seq_list_str = ','.join(seq_list)
 
@@ -164,7 +177,10 @@ def pre_produce():
         thread_out = threading.Thread(name="thread_out", target=load_action, args=(siemens_1500, positionByte,noByte,quantityByte, enableByte, enableBit, enable,out_list, glock))
         thread_out.start()
 
+# while True:
+#     order_list = get_order_list()
 
+#     time.sleep(1)
 if __name__ == "__main__":
     wssArray = gloVar.wssArray
-    pre_produce()
+    get_order_list()
