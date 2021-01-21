@@ -25,8 +25,8 @@ def in_action(siemens_1500, positionByte, position, enableByte, enableBit, enabl
     logger.info(position)
     logger.info('---in action---end-------')
     print('---in action---end-------')
-    while True:
-        if gloVar.
+    # while True:
+    #     pass
 
 
 def out_action(siemens_1500, positionByte,noByte,quantityByte, enableByte, enableBit, enable, out_list, glock):
