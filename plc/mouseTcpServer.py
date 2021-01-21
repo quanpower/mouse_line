@@ -44,7 +44,9 @@ materials_position = {
             'black': [19,20],
             'white': [21,22],
             'pink': [23,24]                                    
-        }                                
+        },
+        'battery': [25],
+        'battery_lid': [26],                                 
     },
     'B': {
         'box': [27,28,29,30,31,32],
@@ -63,8 +65,8 @@ materials_position = {
             'white': [47,48],
             'pink': [49,50]                                    
         },    
-        'battery': [25, 26],
-        'battery_lid': [51,52],                             
+        'battery': [51],
+        'battery_lid': [52],                             
     }
 }
 
@@ -450,6 +452,7 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
                                 } 
                             ],
                         ],
+
                         print(no)
                         if model == 'A':
                             out_list = out_lists[0][int(no)-1]
@@ -507,9 +510,6 @@ if __name__ == "__main__":
         thread_camera_trigger.start()
 
         HOST, PORT = "172.16.6.250", 8000 #windows
-        # HOST, PORT = "192.168.0.200", 8000 #windows
-        # HOST, PORT = "0.0.0.0", 8000 #windows
-        # HOST, PORT = "192.168.8.251", 8000 #windows
 
         server = socketserver.ThreadingTCPServer((HOST, PORT), MyTCPHandler)   #线程
         server.serve_forever()

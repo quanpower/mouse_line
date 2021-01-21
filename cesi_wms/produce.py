@@ -299,5 +299,19 @@ seq_list_str = ','.join(seq_list)
 
 print(seq_list_str)
 
-return_data[0]
 
+pre_produce = return_data[0]
+id = pre_produce['id']
+productCode = pre_produce['productCode']
+seq = pre_produce['seq']
+
+materialList = pre_produce['materialList']
+signType = pre_produce['signType']
+signValue = pre_produce['signValue']
+
+print(id)
+print(productCode)
+print(seq)
+print(materialList)
+print(signType)
+print(signValue)
