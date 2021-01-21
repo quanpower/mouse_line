@@ -148,12 +148,13 @@ def pre_produce(order_list):
                 no = int(key)
                 if value != 'null':
                     return 
-                    
+
             print(position)
             print(no)
-            print(length)
 
             length = material_dict.items()
+            print(length)
+
             quantity = length - no
 
             out = {
@@ -162,9 +163,7 @@ def pre_produce(order_list):
                 'quantity': quantity
             }
             print(out)
-
             out_list.append(out)
-
     print(out_list)
 
     positionByte = 6
