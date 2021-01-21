@@ -30,9 +30,14 @@ def query_system_status(glock):
                     bitArrayA.extend(bitArrayB)
                     wssArray = bitArrayA[0:52]
 
-                    # robot_put_get_done_status = siemens_1500.query_block_from_plc(40,8,8)
-                    # rpgds = struct.unpack('<2H', robot_put_get_done_status)
+                    robot_put_get_done_status = siemens_1500.query_block_from_plc(40,8,1)
+                    rpgds = struct.unpack('>B', robot_put_get_done_status)
+                    print(rpgds)
 
+                    rpgds_array = int2bitarray(rpgds[0], 8)
+                    # print(camera_triggers)
+                    warehouse_get_ok = rpgds_array[5]
+                    warehouse_put_ok = rpgds_array[6]
 
                     camera_trigger = siemens_1500.query_block_from_plc(38,0,1)
                     ct =struct.unpack('>B', camera_trigger)
@@ -80,7 +85,9 @@ def query_system_status(glock):
                         gloVar.robot_status = rs
 
                     gloVar.wssArray = wssArray
-                    gloVar.get_ok = False
+                    gloVar.warehouse_get_ok = warehouse_get_ok
+                    gloVar.warehouse_put_ok = warehouse_put_ok
+
                     
                 except Exception as e:
                     print(e)

@@ -78,7 +78,6 @@ def in_action(siemens_1500, positionByte, position, enableByte, enableBit, enabl
         time.sleep(1)        
 
 
-
 def out_action(siemens_1500, positionByte,noByte,quantityByte, enableByte, enableBit, enable, out_list, glock):
     logger.info('---out action----start-----')
     print('---out action----start-----')

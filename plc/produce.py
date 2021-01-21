@@ -11,6 +11,7 @@ from utils import get_material_dict
 warehouse_bin_uri = 'http://localhost:8088/v1/api/wms/warehouse/bin/'
 
 material_dict = get_material_dict()
+print(material_dict)
 
 def return_materials_position():
 
