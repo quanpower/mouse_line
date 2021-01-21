@@ -69,13 +69,12 @@ def return_materials_position():
     return materials_position
 
 def return_locator_code(locatorList):
-    global wssArray
 
     for j in locatorList:
         index = int(j)
         print(index)
-        print(wssArray)
-        if wssArray[index-1]:
+        print(gloVar.wssArray)
+        if gloVar.wssArray[index-1]:
             return index
 
 def get_order_list():
