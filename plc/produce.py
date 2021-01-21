@@ -120,6 +120,7 @@ def pre_produce(order_list):
         materialCode = i['materialCode']
         locatorCode = material_dict[materialCode]
         locatorList = locatorCode.split(',')
+        print('\n'*3)
         print(locatorCode)
         print(locatorList)
         locatorCode = return_locator_code(locatorList)
@@ -147,6 +148,10 @@ def pre_produce(order_list):
                 no = int(key)
                 if value != 'null':
                     return 
+                    
+            print(position)
+            print(no)
+            print(length)
 
             length = material_dict.items()
             quantity = length - no
@@ -157,7 +162,7 @@ def pre_produce(order_list):
                 'quantity': quantity
             }
             print(out)
-            
+
             out_list.append(out)
 
     print(out_list)
