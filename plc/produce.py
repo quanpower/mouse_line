@@ -152,7 +152,7 @@ def pre_produce(order_list):
             print(position)
             print(no)
 
-            length = material_dict.items()
+            length = len(material_dict.items())
             print(length)
 
             quantity = length - no
