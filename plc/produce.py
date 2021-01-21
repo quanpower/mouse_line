@@ -1,7 +1,6 @@
 import requests
 import json
 
-
 from global_list import gloVar
 
 material_storage_uri = 'http://localhost:8088/v1/api/wms/material_storage'
@@ -65,9 +64,13 @@ def return_materials_position():
     return materials_position
 
 def return_locator_code(locatorList):
+    global wssArray
+
     for j in locatorList:
         index = int(j)
-        if gloVar.wssArray[index-1]:
+        print(index)
+        print(wssArray)
+        if wssArray[index-1]:
             return index
 
 def pre_produce():
@@ -111,9 +114,13 @@ def pre_produce():
         materialCode = i['materialCode']
         locatorCode = material_dict[materialCode]
         locatorList = locatorCode.split(',')
+        print(locatorCode)
+        print(type(locatorCode))
+        print(locatorList)
 
         locatorCode = return_locator_code(locatorList)
 
+        print(locatorCode)
         positions.append(locatorCode)
 
     print(positions)
@@ -159,4 +166,5 @@ def pre_produce():
 
 
 if __name__ == "__main__":
+    wssArray = gloVar.wssArray
     pre_produce()
