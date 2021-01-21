@@ -133,8 +133,8 @@ def pre_produce():
         quantity = length - no
 
         out = {
-            'position': position
-            'no': no
+            'position': position,
+            'no': no,
             'quantity': quantity
         }
 
