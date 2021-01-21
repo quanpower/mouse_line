@@ -107,32 +107,36 @@ def logger(log_obj):
 
     return logger
 
+def return_locator_code(locatorList):
+
+    for j in locatorList:
+        index = int(j)
+        if not gloVar.wssArray[index-1]:
+            return index
 
 def return_position(warehouse, goods, color):
     if goods == 6:
         # box
-        position = warehouse['box'][0]
+        position = return_locator_code(warehouse['box'])
     elif goods == 3:
         # bottom
-        position = warehouse['bottom'][color][0]
+        position = return_locator_code(warehouse['bottom'][color])
     elif goods == 2:
         # middle
-        position = warehouse['middle'][color][0]
+        position = return_locator_code(warehouse['middle'][color])
     elif goods == 1:
         # up
-        position = warehouse['up'][color][0]
+        position = return_locator_code(warehouse['up'][color])
     elif goods == 4:
         # battery
-        position = warehouse['battery'][0]
+        position = return_locator_code(warehouse['battery'])
     elif goods == 5:
         # battery_lid
-        position = warehouse['battery_lid'][0]
+        position = return_locator_code(warehouse['battery_lid'])
     else:
         print('unknown!')  
         position = 0       
     return position
-
-
 class MyTCPHandler(socketserver.BaseRequestHandler):
     # def __init__(self, socket, host_port, server):
     #     self.server = server
@@ -272,7 +276,8 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
                             logger.info(ng)
                             logger.info(goods)
                             # ng==1 ,success
-                            if ng == 1:
+                            # if ng == 1:
+                            if 1:
                                 print('camera data ok!')
                                 positionByte = 2
                                 enableByte = 1
@@ -286,8 +291,11 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
                                     warehouse = materials_position['B']
                                     position = return_position(warehouse, goods, color) 
 
+                                print('====position===')
+                                print(position)
+
                                 if position != 0:
-                                    thread_in = threading.Thread(name="thread_in", target=in_action, args=(siemens_1500, positionByte, position, enableByte, enableBit, enable, glock))
+                                    thread_in = threading.Thread(name="thread_in", target=in_action, args=(siemens_1500, positionByte, position, enableByte, enableBit, enable, goods, glock))
                                     thread_in.start()   
 
                     
@@ -329,7 +337,7 @@ if __name__ == "__main__":
         thread_camera_trigger.start()
 
         # 循环读取生产订单，准备生产
-        thread_produce_trigger = threading.Thread(name='thread_produce_trigger', target=produce)
+        thread_produce_trigger = threading.Thread(name='thread_produce_trigger', target=produce, args=(glock,))
         thread_produce_trigger.start()
 
         HOST, PORT = "172.16.6.250", 8000 #windows

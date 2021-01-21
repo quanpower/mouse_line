@@ -13,4 +13,6 @@ class gloVar():
     quantity = 0
     ready_ok = False
     producing = False
+    warehouse_put_ok = False
+    
 

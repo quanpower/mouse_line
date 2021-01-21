@@ -80,6 +80,7 @@ def query_system_status(glock):
                         gloVar.robot_status = rs
 
                     gloVar.wssArray = wssArray
+                    gloVar.get_ok = False
                     
                 except Exception as e:
                     print(e)

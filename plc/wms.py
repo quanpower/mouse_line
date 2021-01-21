@@ -346,7 +346,7 @@ async def update_warehouse_bin(bin_id: int, plate: Plate, q: Optional[str] = Non
     isEmpty = plate.isEmpty
     materialList = plate.materialList
     print(materialList)
-    query = warehouse.update().where(warehouse.c.id==bin_id).values(isEmpty=0, materialList=materialList)
+    query = warehouse.update().where(warehouse.c.id==bin_id).values(isEmpty=isEmpty, materialList=materialList)
     last_record_id = await database.execute(query)
 
     return_json = {
@@ -422,7 +422,7 @@ async def update_line_storage_bin(bin_id: int, plate: Plate, q: Optional[str] = 
     isEmpty = plate.isEmpty
     materialList = plate.materialList
     print(materialList)
-    query = linestorage.update().where(linestorage.c.id==bin_id).values(isEmpty=0, materialList=materialList)
+    query = linestorage.update().where(linestorage.c.id==bin_id).values(isEmpty=isEmpty, materialList=materialList)
     last_record_id = await database.execute(query)
 
     return_json = {

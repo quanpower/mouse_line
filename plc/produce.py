@@ -3,6 +3,8 @@ import json
 import time
 from global_list import gloVar
 import operator
+import threading 
+from RobotActionLock import in_action, out_action, load_action, unload_action
 
 warehouse_bin_uri = 'http://localhost:8088/v1/api/wms/warehouse/bin/'
 
@@ -16,7 +18,8 @@ def get_material_dict():
 
     material_dict = {}
     for i in material_storage:
-        material_dict[i['materialCode']] = i['locatorCode']
+        locatorCodeList = i['locatorCode'].split(',')
+        material_dict[i['materialCode']] = locatorCodeList
     # print(material_dict)
     return material_dict
 
@@ -89,7 +92,7 @@ def get_order_list():
     print(sorted_order_list)
     return sorted_order_list
 
-def pre_produce(order_list):
+def pre_produce(order_list, siemens_1500, glock):
     
     global material_dict
 
@@ -118,8 +121,7 @@ def pre_produce(order_list):
     positions = []
     for i in materialList:
         materialCode = i['materialCode']
-        locatorCode = material_dict[materialCode]
-        locatorList = locatorCode.split(',')
+        locatorList = material_dict[materialCode]
         print('\n'*3)
         print(locatorCode)
         print(locatorList)
@@ -163,7 +165,10 @@ def pre_produce(order_list):
                 'quantity': quantity
             }
             print(out)
-            out_list.append(out)
+
+            if quantity > 0:
+                out_list.append(out)
+
     print(out_list)
 
     positionByte = 6
@@ -174,14 +179,16 @@ def pre_produce(order_list):
     enable = 1
 
     if out_list:
-        thread_out = threading.Thread(name="thread_out", target=load_action, args=(siemens_1500, positionByte,noByte,quantityByte, enableByte, enableBit, enable,out_list, glock))
-        thread_out.start()
+        thread_load = threading.Thread(name="thread_load", target=load_action, args=(siemens_1500, positionByte,noByte,quantityByte, enableByte, enableBit, enable,out_list, glock))
+        thread_load.start()
 
-def produce():
+def produce(glock):
+    siemens_1500 =  gloVar.siemens_1500
     while True:
         order_list = get_order_list()
         if not gloVar.producing :
-            pre_produce(order_list)
+            pre_produce(order_list, siemens_1500, glock)
+
         time.sleep(100)
 
 if __name__ == "__main__":
