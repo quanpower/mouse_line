@@ -148,9 +148,11 @@ def pre_produce():
     enableByte = 4
     enableBit = 0
     enable = 1
-    
+
     if out_list:
-        thread_out = threading.Thread(name="thread_out", target=out_action, args=(siemens_1500, positionByte,noByte,quantityByte, enableByte, enableBit, enable,out_list, glock))
+        thread_out = threading.Thread(name="thread_out", target=load_action, args=(siemens_1500, positionByte,noByte,quantityByte, enableByte, enableBit, enable,out_list, glock))
         thread_out.start()
 
 
+if __name__ == "__main__":
+    pre_produce()
