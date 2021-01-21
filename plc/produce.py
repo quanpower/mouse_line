@@ -124,37 +124,38 @@ def pre_produce(order_list):
         print(locatorList)
 
         locatorCode = return_locator_code(locatorList)
-
         print(locatorCode)
         positions.append(locatorCode)
-
+    print('===positions===')
     print(positions)
 
     out_list = []
 
     for position in positions:
-        r = requests.get(warehouse_bin_uri + str(position))
-        return_json = r.json()
+        if position:
+            r = requests.get(warehouse_bin_uri + str(position))
+            return_json = r.json()
+            print(return_json)
 
-        warehouse_bin = return_json['data']
-        print(warehouse_bin)
-        material_dict = json.loads(warehouse_bin[0]['materialList'])
+            warehouse_bin = return_json['data']
+            print(warehouse_bin)
+            material_dict = json.loads(warehouse_bin[0]['materialList'])
 
-        for key,value in material_dict.items():
-            no = int(key)
-            if value != 'null':
-                return 
+            for key,value in material_dict.items():
+                no = int(key)
+                if value != 'null':
+                    return 
 
-        length = material_dict.items()
-        quantity = length - no
+            length = material_dict.items()
+            quantity = length - no
 
-        out = {
-            'position': position,
-            'no': no,
-            'quantity': quantity
-        }
+            out = {
+                'position': position,
+                'no': no,
+                'quantity': quantity
+            }
 
-        out_list.append(out)
+            out_list.append(out)
 
     print(out_list)
 
