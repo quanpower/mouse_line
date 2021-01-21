@@ -9,11 +9,12 @@ r = requests.get(material_storage_uri)
 return_json = r.json()
 
 material_storage = return_json['data']
-print(material_storage)
+# print(material_storage)
+
 material_dict = {}
 for i in material_storage:
     material_dict[i['materialCode']] = i['locatorCode']
-print(material_dict)
+# print(material_dict)
 
 warehouse_bin_uri = 'http://localhost:8088/v1/api/wms/warehouse/bin/'
 
