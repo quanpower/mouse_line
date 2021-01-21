@@ -10,6 +10,7 @@ from PlcConn import plcConn
 from SystemStatusLock import query_system_status
 from RobotActionLock import in_action, out_action
 from camera import trigger_assembly_line_camara, trigger_warehouse_camara, shift_action, camera_trigger
+from produce import produce
 from laser_client import client_send
 import threading 
 import traceback
@@ -289,189 +290,7 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
                                     thread_in = threading.Thread(name="thread_in", target=in_action, args=(siemens_1500, positionByte, position, enableByte, enableBit, enable, glock))
                                     thread_in.start()   
 
-                    elif 'produce' == data_tuple[0]:
-                        data = data_tuple[1]
-                        datalist = data_tuple[1].split(',')  
-
-                        model = datalist[0]
-                        color = datalist[1]
-                        no = datalist[2]
-
-
-                        if model == 'A':
-                            warehouse = materials_position['A']
-                            box_p = warehouse['box'][0]
-                            bottom_p = warehouse['bottom'][color][0]
-                            middle_p = warehouse['middle'][color][0]
-                            up_p = warehouse['up'][color][0]
-                            out_list = [box_p, bottom_p, middle_p, up_p]
-                        elif model == 'B':
-                            warehouse = materials_position['B']
-                            box_p = warehouse['box'][0]
-                            bottom_p = warehouse['bottom'][color][0]
-                            middle_p = warehouse['middle'][color][0]
-                            up_p = warehouse['up'][color][0]
-                            battery_p = warehouse['battery'][0]
-                            battery_lid_p = warehouse['battery_lid'][0]
-
-                            out_list = [box_p, bottom_p, middle_p, up_p, battery_p, battery_lid_p]
-                        else:
-                            out_list = []
-
-                        # out_list = [7,13,19,3]
-                        # out_list = [7,13,19]
-                        out_lists = [
-                            [
-                                {'position':7,
-                                'no':1,
-                                'quantity':6
-                                },
-                                {'position':13,
-                                'no':1,
-                                'quantity':6
-                                },
-                                {'position':19,
-                                'no':1,
-                                'quantity':6
-                                },
-                                {'position':3,
-                                'no':1,
-                                'quantity':6
-                                } 
-                            ],[
-                                {'position':7,
-                                'no':2,
-                                'quantity':5
-                                },
-                                {'position':13,
-                                'no':2,
-                                'quantity':5
-                                },
-                                {'position':19,
-                                'no':2,
-                                'quantity':5
-                                },
-                                {'position':3,
-                                'no':2,
-                                'quantity':5
-                                } 
-                            ],[
-                                {'position':7,
-                                'no':3,
-                                'quantity':4
-                                },
-                                {'position':13,
-                                'no':3,
-                                'quantity':4
-                                },
-                                {'position':19,
-                                'no':3,
-                                'quantity':4
-                                },
-                                {'position':3,
-                                'no':3,
-                                'quantity':4
-                                } 
-                            ],
-                        ],
-                        out_lists_1 = [
-                            [
-                                {'position':33,
-                                'no':1,
-                                'quantity':6
-                                },
-                                {'position':39,
-                                'no':1,
-                                'quantity':6
-                                },
-                                {'position':45,
-                                'no':1,
-                                'quantity':6
-                                },
-                                {'position':51,
-                                'no':1,
-                                'quantity':6
-                                },
-                                {'position':52,
-                                'no':1,
-                                'quantity':6
-                                },                                                                
-                                {'position':29,
-                                'no':1,
-                                'quantity':6
-                                } 
-                            ],[
-                                {'position':33,
-                                'no':2,
-                                'quantity':5
-                                },
-                                {'position':39,
-                                'no':2,
-                                'quantity':5
-                                },
-                                {'position':45,
-                                'no':2,
-                                'quantity':5
-                                },
-                                {'position':51,
-                                'no':2,
-                                'quantity':5
-                                },
-                                {'position':52,
-                                'no':2,
-                                'quantity':5
-                                },                                                                
-                                {'position':29,
-                                'no':2,
-                                'quantity':5
-                                } 
-                            ],[
-                                {'position':33,
-                                'no':3,
-                                'quantity':4
-                                },
-                                {'position':39,
-                                'no':3,
-                                'quantity':4
-                                },
-                                {'position':45,
-                                'no':3,
-                                'quantity':4
-                                },
-                                {'position':51,
-                                'no':3,
-                                'quantity':4
-                                },
-                                {'position':52,
-                                'no':3,
-                                'quantity':4
-                                },                                                                
-                                {'position':29,
-                                'no':3,
-                                'quantity':4
-                                } 
-                            ],
-                        ],
-
-                        print(no)
-                        if model == 'A':
-                            out_list = out_lists[0][int(no)-1]
-                        elif model == 'B':
-                            out_list = out_lists_1[0][int(no)-1]
-                        else:
-                            out_list=[]
-                        # print(out_lists)
-                        print(out_list)
-
-                        positionByte = 6
-                        noByte = 94
-                        quantityByte = 96
-                        enableByte = 4
-                        enableBit = 0
-                        enable = 1
-                        if out_list:
-                            thread_out = threading.Thread(name="thread_out", target=out_action, args=(siemens_1500, positionByte,noByte,quantityByte, enableByte, enableBit, enable,out_list, glock))
-                            thread_out.start()
+                    
 
                     elif 'trigger2' == data_tuple[0]:
                         triggerCtl = 'A101'
@@ -508,6 +327,10 @@ if __name__ == "__main__":
         # 循环读取触发信号
         thread_camera_trigger = threading.Thread(name='thread_camera_trigger', target=camera_trigger)
         thread_camera_trigger.start()
+
+        # 循环读取生产订单，准备生产
+        thread_produce_trigger = threading.Thread(name='thread_produce_trigger', target=produce)
+        thread_produce_trigger.start()
 
         HOST, PORT = "172.16.6.250", 8000 #windows
 

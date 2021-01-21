@@ -446,6 +446,14 @@ async def update_order_list(order: Order):
         "data" : seq_list
     }
 
+@app.post("/v1/api/wms/produce_test")
+async def produce_test():
+    return {
+        "code" : 0,
+        "message" : "数据处理成功！",
+        "data" : {"produce": 'started!' }
+    }
+
 
 if __name__ == '__main__':
     uvicorn.run(app=app,host="0.0.0.0",port=8088,debug=True)        

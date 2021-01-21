@@ -79,11 +79,7 @@ def return_locator_code(locatorList):
             return index
 
 def get_order_list():
-    
-    global material_dict
-
     uri = 'http://172.16.1.62/aim-mes/open-api/order/produce/v1/list'
-
     r = requests.get(uri)
     return_json = r.json()
     # print(return_json)
@@ -105,11 +101,10 @@ def pre_produce(order_list):
 
     print(seq_list_str)
 
-    pre_produce = return_data[0]
+    pre_produce = order_list[0]
     id = pre_produce['id']
     productCode = pre_produce['productCode']
     seq = pre_produce['seq']
-
     materialList = pre_produce['materialList']
     signType = pre_produce['signType']
     signValue = pre_produce['signValue']
@@ -127,7 +122,6 @@ def pre_produce(order_list):
         locatorCode = material_dict[materialCode]
         locatorList = locatorCode.split(',')
         print(locatorCode)
-        print(type(locatorCode))
         print(locatorList)
 
         locatorCode = return_locator_code(locatorList)
@@ -176,10 +170,13 @@ def pre_produce(order_list):
         thread_out = threading.Thread(name="thread_out", target=load_action, args=(siemens_1500, positionByte,noByte,quantityByte, enableByte, enableBit, enable,out_list, glock))
         thread_out.start()
 
-# while True:
-#     order_list = get_order_list()
+def produce():
+    while True:
+        order_list = get_order_list()
+        if not gloVar.producing :
+            pre_produce(order_list)
+        time.sleep(100)
 
-#     time.sleep(1)
 if __name__ == "__main__":
     wssArray = gloVar.wssArray
     get_order_list()
