@@ -31,8 +31,8 @@ def query_system_status(glock):
                     bitArrayA.extend(bitArrayB)
                     wssArray = bitArrayA[0:52]
 
-                    robot_put_get_done_status = siemens_1500.query_block_from_plc(40,8,8)
-                    rpgds = struct.unpack('<2H', robot_put_get_done_status)
+                    # robot_put_get_done_status = siemens_1500.query_block_from_plc(40,8,8)
+                    # rpgds = struct.unpack('<2H', robot_put_get_done_status)
 
 
                     camera_trigger = siemens_1500.query_block_from_plc(38,0,1)
