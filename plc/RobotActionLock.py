@@ -2,9 +2,8 @@ import threading
 import time
 import datetime
 import struct
-from plc_addr import robots_addr
 from utils import int2bitarray
-
+import requests
 from global_list import gloVar
 
 import logging
@@ -26,6 +25,8 @@ def in_action(siemens_1500, positionByte, position, enableByte, enableBit, enabl
     logger.info(position)
     logger.info('---in action---end-------')
     print('---in action---end-------')
+    while True:
+        if gloVar.
 
 
 def out_action(siemens_1500, positionByte,noByte,quantityByte, enableByte, enableBit, enable, out_list, glock):

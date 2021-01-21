@@ -2,7 +2,6 @@ import threading
 import time
 import datetime
 import struct
-from plc_addr import robots_addr
 from utils import int2bitarray
 
 from global_list import gloVar
