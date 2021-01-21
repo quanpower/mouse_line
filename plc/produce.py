@@ -71,6 +71,7 @@ def return_locator_code(locatorList):
             return index
 
 def pre_produce():
+    global material_dict
     uri = 'http://172.16.1.62/aim-mes/open-api/order/produce/v1/list'
 
     r = requests.get(uri)
