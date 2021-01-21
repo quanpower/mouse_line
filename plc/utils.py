@@ -1,4 +1,4 @@
-
+import requests
 import json
 
 def generate_materials_list():
@@ -328,6 +328,21 @@ def generate_line_storage_info_init():
     print(lineStorageValues)
     return lineStorageValues
 
+
+def get_material_dict():
+    material_storage_uri = 'http://localhost:8088/v1/api/wms/material_storage'
+    r = requests.get(material_storage_uri)
+    return_json = r.json()
+
+    material_storage = return_json['data']
+    # print(material_storage)
+
+    material_dict = {}
+    for i in material_storage:
+        locatorCodeList = i['locatorCode'].split(',')
+        material_dict[i['materialCode']] = locatorCodeList
+    # print(material_dict)
+    return material_dict
 
 def bcd_to_int(x):
     """

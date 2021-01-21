@@ -5,23 +5,10 @@ from global_list import gloVar
 import operator
 import threading 
 from RobotActionLock import in_action, out_action, load_action, unload_action
+from utils import get_material_dict
+
 
 warehouse_bin_uri = 'http://localhost:8088/v1/api/wms/warehouse/bin/'
-
-def get_material_dict():
-    material_storage_uri = 'http://localhost:8088/v1/api/wms/material_storage'
-    r = requests.get(material_storage_uri)
-    return_json = r.json()
-
-    material_storage = return_json['data']
-    # print(material_storage)
-
-    material_dict = {}
-    for i in material_storage:
-        locatorCodeList = i['locatorCode'].split(',')
-        material_dict[i['materialCode']] = locatorCodeList
-    # print(material_dict)
-    return material_dict
 
 material_dict = get_material_dict()
 
@@ -191,6 +178,3 @@ def produce(glock):
 
         time.sleep(100)
 
-if __name__ == "__main__":
-    wssArray = gloVar.wssArray
-    get_order_list()

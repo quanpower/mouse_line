@@ -7,8 +7,7 @@ import requests
 from global_list import gloVar
 import json
 import logging
-from utils import generate_plate_info_json
-from produce import get_material_dict
+from utils import generate_plate_info_json, get_material_dict
 
 logger = logging.getLogger(__name__)
 
