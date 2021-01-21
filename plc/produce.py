@@ -86,10 +86,9 @@ def get_order_list():
 
     r = requests.get(uri)
     return_json = r.json()
-    print(return_json)
-
+    # print(return_json)
     order_list = return_json['data']
-    print(order_list)
+    # print(order_list)
 
     sorted_order_list = sorted(order_list, key=operator.itemgetter('seq'))
     print(sorted_order_list)
