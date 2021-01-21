@@ -9,7 +9,9 @@ import uvicorn
 import json
 from typing import Optional
 
-from utils import generate_materials_list, generate_plate_info_json, generate_warehouse_info, generate_warehouse_info_init, generate_line_storage_info, generate_line_storage_info_init, generate_material_storage_init
+from utils import generate_materials_list, generate_plate_info_json, generate_warehouse_info, \
+    generate_warehouse_info_init, generate_line_storage_info, \
+    generate_line_storage_info_init, generate_material_storage_init, get_material_dict
 
 app = FastAPI()
 
@@ -174,6 +176,12 @@ order_sample={
     ]
 }
 
+material_dict = get_material_dict()
+
+def get_material_code(position):
+    for key,value in material_dict.items():
+        if str(position) in value:
+            return key
 
 @app.on_event("startup")
 async def startup():
@@ -453,6 +461,34 @@ async def produce_test():
         "message" : "数据处理成功！",
         "data" : {"produce": 'started!' }
     }
+
+@app.put("/v1/api/wms/warehouse/fake/{bin_id}")
+async def update_warehouse_bin(bin_id: int, q: Optional[str] = None):
+    isEmpty = 0
+    material_code = get_material_code()
+    if bin_id >= 1 and bin_id <= 6 or bin_id >= 27 and bin_id <= 32:
+        materialList = generate_plate_info_json(1,7, material_code) 
+    elif bin_id >= 7 and bin_id <= 24 or bin_id >= 33 and bin_id <= 50:
+        materialList = generate_plate_info_json(1,10, material_code) 
+    elif bin_id == 25 or bin_id == 51:
+        materialList = generate_plate_info_json(1,55, material_code) 
+    elif bin_id == 26 or bin_id == 52:
+        materialList = generate_plate_info_json(1,55, material_code) 
+    else:
+        print('unknown!')
+        
+    print(materialList)
+    query = warehouse.update().where(warehouse.c.id==bin_id).values(isEmpty=isEmpty, materialList=materialList)
+    last_record_id = await database.execute(query)
+
+    return_json = {
+        "code" : 0,
+        "message" : "数据处理成功！",
+        "data" : [
+            {"id": last_record_id, "bin_id": bin_id}
+        ]  
+    }
+    return return_json
 
 
 if __name__ == '__main__':

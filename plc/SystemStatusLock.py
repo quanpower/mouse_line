@@ -21,6 +21,7 @@ def query_system_status(glock):
             with glock:
                 try:
                     # print('=====robot_0======')
+                    # 立库52格位有无信号
                     warehouse_senser_status = siemens_1500.query_block_from_plc(40,0,8)
                     wss =struct.unpack('<2I', warehouse_senser_status)
                     status_a = wss[0]
@@ -29,21 +30,21 @@ def query_system_status(glock):
                     bitArrayB = int2bitarray(status_b, 32)
                     bitArrayA.extend(bitArrayB)
                     wssArray = bitArrayA[0:52]
-
+                    # 取件，放件完成
                     robot_put_get_done_status = siemens_1500.query_block_from_plc(40,8,1)
                     rpgds = struct.unpack('>B', robot_put_get_done_status)
-                    print(rpgds)
-
+                    # print(rpgds)
                     rpgds_array = int2bitarray(rpgds[0], 8)
-                    # print(camera_triggers)
                     warehouse_get_ok = rpgds_array[5]
                     warehouse_put_ok = rpgds_array[6]
-
+                    # 相机触发
                     camera_trigger = siemens_1500.query_block_from_plc(38,0,1)
                     ct =struct.unpack('>B', camera_trigger)
                     # print('===camera_trigger===')
                     camera_triggers = int2bitarray(ct[0], 8)
                     # print(camera_triggers)
+
+                    # 准备完成
                     ready_ok = camera_triggers[7]
 
                     robot_status = siemens_1500.query_block_from_plc(38,16,28)
@@ -68,13 +69,12 @@ def query_system_status(glock):
                     logger.info('=====warehouse_senser_status======')
                     logger.info(wss)
                     logger.info(rs)
+                    logger.info(wssArray)
+
                     # print('=====warehouse_senser_status======')
                     # print(bitArrayA)
                     # print(bitArrayB)
                     # print(wssArray)
-                    logger.info(bitArrayA)
-                    logger.info(bitArrayB)
-                    logger.info(wssArray)
 
                     if wss:
                         gloVar.warehouse_senser_status = wss

@@ -297,14 +297,6 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
                                 if position != 0:
                                     thread_in = threading.Thread(name="thread_in", target=in_action, args=(siemens_1500, positionByte, position, enableByte, enableBit, enable, goods, glock))
                                     thread_in.start()   
-
-                    
-
-                    elif 'trigger2' == data_tuple[0]:
-                        triggerCtl = 'A101'
-                        thread_trigger = threading.Thread(name="thread_trigger", target=trigger_assembly_line_camara, args=('192.168.0.111', triggerCtl))
-                        thread_trigger.start()                     
-
                     else:
                         print('unhandled!')
                         print(data_tuple)
