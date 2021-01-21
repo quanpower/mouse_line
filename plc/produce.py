@@ -110,7 +110,6 @@ def pre_produce(order_list, siemens_1500, glock):
         materialCode = i['materialCode']
         locatorList = material_dict[materialCode]
         print('\n'*3)
-        print(locatorCode)
         print(locatorList)
         locatorCode = return_locator_code(locatorList)
         print('===locatorCode===')
