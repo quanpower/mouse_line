@@ -1,6 +1,7 @@
 import requests
 import json
 import time
+import datetime
 from global_list import gloVar
 import operator
 import threading 
@@ -89,9 +90,7 @@ def order_opcua(order_list):
     ua_order_list = []
     for i in order_list:
         seq_list.append(i['seq'])
-
         seq_list_str = ','.join(seq_list)
-
         print(seq_list_str)
 
         pre_produce = i
@@ -102,7 +101,7 @@ def order_opcua(order_list):
         signType = pre_produce['signType']
         signValue = pre_produce['signValue']
 
-        order_dict = {'orderNo': seq, 'productNo': productNo, 'state': 0, 'duration': 0}
+        order_dict = {'orderNo': seq, 'productNo': productCode, 'state': 0, 'duration': 0}
         ua_order_list.append(order_dict)
         
     gloVar.ua_order_list = ua_order_list
@@ -126,6 +125,13 @@ def pre_produce(order_list, siemens_1500, glock):
     materialList = pre_produce['materialList']
     signType = pre_produce['signType']
     signValue = pre_produce['signValue']
+    
+    # 更新全局生产订单状态
+    gloVar.orderNo = seq
+    gloVar.productNo = productCode
+    gloVar.state = 1
+    gloVar.startTime = time.time()
+
 
     # print(id)
     # print(productCode)
@@ -192,8 +198,9 @@ def pre_produce(order_list, siemens_1500, glock):
     enable = 1
 
     if out_list:
-        thread_load = threading.Thread(name="thread_load", target=load_action, args=(siemens_1500, positionByte,noByte,quantityByte, enableByte, enableBit, enable, out_list, glock))
+        thread_load = threading.Thread(name="thread_load", target=load_action, args=(siemens_1500, positionByte,noByte,quantityByte, enableByte, enableBit, enable, out_list,seq, productCode, glock))
         thread_load.start()
+
 
 def pre_unload(siemens_1500, glock):
     positionByte = 2
@@ -213,22 +220,34 @@ def load_trigger(glock):
 
     while True:
         order_list = get_order_list()
-        if gloVar.producing :
+        order_opcua(order_list)
+        
+        if gloVar.producing:
             pre_produce(order_list, siemens_1500, glock)
-        time.sleep(120)
+        time.sleep(10)
 
 def unload_trigger(glock):
     siemens_1500 =  gloVar.siemens_1500
+    line_storage_bin_url = "http://localhost:8088/v1/api/wms/line_storage/bin/"
+
     while True:
-        trigger_list = [gloVar.z2_get_ok, gloVar.z3_get_ok, gloVar.z4_get_ok, gloVar.z5_get_ok, gloVar.z6_get_ok, gloVar.z7_get_ok]
-        quantity_list = [] 
         if any(gloVar.line_get_ok_list):
+            index = gloVar.line_get_ok_list.index(True)
+            r = requests.get(line_storage_bin_url + str(index))
+            return_json = r.json()
+            # print(return_json)
+
+            line_storage_bin = return_json['data']
+            print(line_storage_bin)
+            print('source is:')
+
             pre_unload(siemens_1500, glock)
         time.sleep(0.2)
 
 def out_trigger(glock):
     siemens_1500 =  gloVar.siemens_1500
     while True:
-        if not gloVar.producing :
-            pre_out(order_list, siemens_1500, glock)
+        if False :
+            # 托盘全空
+            pre_out()
         time.sleep(1)

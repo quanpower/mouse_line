@@ -37,6 +37,16 @@ def get_material_code(position):
         if str(position) in value:
             return key
 
+def write_string_to_plc(s1500,string2plc,start):
+    s = '00' + string2plc
+    byarray=bytearray(s,encoding='utf-8')
+    print(byarray)
+
+    for i, val in enumerate(byarray):
+        index = start + i 
+        print ("序号：%s   值：%s" % (i + 1, val))
+        s1500.write_area(0x84,38,index, struct.pack('B', val))
+
 
 def post_mes_warehouse():
     # get 最新立库信息
@@ -173,7 +183,7 @@ def out_action(siemens_1500, positionByte,noByte,quantityByte, enableByte, enabl
     print('---out action---end-------')
 
 
-def load_action(siemens_1500, positionByte,noByte,quantityByte, enableByte, enableBit, enable, out_list, glock):
+def load_action(siemens_1500, positionByte,noByte,quantityByte, enableByte, enableBit, enable, out_list, seq, productCode, glock):
     logger.info('---out action----start-----')
     print('---out action----start-----')
     print(out_list)
@@ -208,6 +218,10 @@ def load_action(siemens_1500, positionByte,noByte,quantityByte, enableByte, enab
                     siemens_1500.write_int_to_plc(38, quantityByte, quantity)
                     time.sleep(0.1)
                     siemens_1500.write_bool_to_plc(38, enableByte, enableBit, enable)
+                    # 写入订单号，产品号
+                    write_string_to_plc(siemens_1500, seq, 98 )
+                    write_string_to_plc(siemens_1500, productCode, 354 )
+
                     print(positionByte)
                     print(enableByte)
                     print(enableBit)
@@ -262,7 +276,7 @@ def load_action(siemens_1500, positionByte,noByte,quantityByte, enableByte, enab
     print('---out action---end-------')
 
 
-def unload_action(siemens_1500, positionByte, position, enableByte, enableBit, enable, glock):
+def unload_action(siemens_1500, positionByte, line_no, position, enableByte, enableBit, enable, glock):
     logger.info('---in action----start-----')
     print('---in action----start-----')
     print(datetime.datetime.now())
@@ -277,7 +291,7 @@ def unload_action(siemens_1500, positionByte, position, enableByte, enableBit, e
     i = 0
     while True:
 
-        line_trigger = gloVar.line_put_ok_list[line_no-1]
+        line_trigger = gloVar.line_get_ok_list[line_no-1]
 
         warehouse_url = warehouse_bin_url + str(position)
         line_storage_url = line_storage_bin_url + str(line_no)
@@ -295,8 +309,6 @@ def unload_action(siemens_1500, positionByte, position, enableByte, enableBit, e
             print(material_code)
             print(gloVar.robot_status[8])
             # 更新数量
-            material_list = generate_unload_material_list_json(1,10,material_code)
-
             url = 'http://localhost:8088/v1/api/wms/warehouse/bin/' + str(position)
             param = {'isEmpty': 0,
             'materialList': source_material_list

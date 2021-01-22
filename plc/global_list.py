@@ -22,7 +22,14 @@ class gloVar():
     plate_check_list = []
     
     ua_order_list = []
+    producing = False
     
+    # 生产订单状态
+    orderNo = ''
+    productNo = ''
+    state = 0
+    startTime = 0
+
     # z2_get_ok = False
     # z2_put_ok = False
 
@@ -38,5 +45,4 @@ class gloVar():
     # z7_get_ok = False
     # z7_put_ok = False  
 
-    producing = False
 
