@@ -82,6 +82,7 @@ def get_plate_no(plate_dict):
         no = int(key)
         if value != 'null':
             return no
+    return 1
 
 def pre_produce(order_list, siemens_1500, glock):
     
@@ -134,17 +135,17 @@ def pre_produce(order_list, siemens_1500, glock):
 
             warehouse_bin = return_json['data']
             plate_dict = json.loads(warehouse_bin[0]['materialList'])
-            # print('====plate_dict===')
-            # print(plate_dict)
+            print('====plate_dict===')
+            print(plate_dict)
 
             no = get_plate_no(plate_dict)
             length = len(plate_dict.items())
 
-            # print(position)
-            # print(no)
-            # print(length)
+            print(position)
+            print(no)
+            print(length)
 
-            quantity = length - no +1
+            quantity = length - no + 1
 
             out = {
                 'position': position,
@@ -170,8 +171,7 @@ def pre_produce(order_list, siemens_1500, glock):
         thread_load = threading.Thread(name="thread_load", target=load_action, args=(siemens_1500, positionByte,noByte,quantityByte, enableByte, enableBit, enable, out_list, glock))
         thread_load.start()
 
-def pre_unload():
-
+def pre_unload(siemens_1500, glock):
     positionByte = 2
     enableByte = 1
     enableBit = 0
@@ -189,7 +189,7 @@ def load_trigger(glock):
 
     while True:
         order_list = get_order_list()
-        if not gloVar.producing :
+        if gloVar.producing :
             pre_produce(order_list, siemens_1500, glock)
         time.sleep(60)
 
@@ -198,7 +198,7 @@ def unload_trigger(glock):
     while True:
         trigger_list = [gloVar.z2_get_ok, gloVar.z3_get_ok, gloVar.z4_get_ok, gloVar.z5_get_ok, gloVar.z6_get_ok, gloVar.z7_get_ok]
         quantity_list = [] 
-        if any gloVar.line_get_ok_list:
+        if any(gloVar.line_get_ok_list):
             pre_unload(siemens_1500, glock)
         time.sleep(0.2)
 
