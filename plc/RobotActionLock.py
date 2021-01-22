@@ -39,27 +39,29 @@ def in_action(siemens_1500, positionByte, position, enableByte, enableBit, enabl
         if gloVar.warehouse_put_ok:
             # 放件完成，更新入库
 
-            material_code = get_material_code(position)
-            print(material_code)
+            # material_code = get_material_code(position)
+            # print(material_code)
 
-            if goods == 6:
-                # box
-                material_list = generate_plate_info_json(1,7,material_code)
-            elif goods == 3:
-                # bottom
-                material_list = generate_plate_info_json(1,10,material_code)
-            elif goods == 2:
-                # middle
-                material_list = generate_plate_info_json(1,10,material_code)
-            elif goods == 1:
-                # up
-                material_list = generate_plate_info_json(1,10,material_code)
-            elif goods == 4:
-                # battery
-                material_list = generate_plate_info_json(1,55,material_code)
-            elif goods == 5:
-                # battery_lid
-                material_list = generate_plate_info_json(1,53,material_code)
+            # if goods == 6:
+            #     # box
+            #     material_list = generate_plate_info_json(1,7,material_code)
+            # elif goods == 3:
+            #     # bottom
+            #     material_list = generate_plate_info_json(1,10,material_code)
+            # elif goods == 2:
+            #     # middle
+            #     material_list = generate_plate_info_json(1,10,material_code)
+            # elif goods == 1:
+            #     # up
+            #     material_list = generate_plate_info_json(1,10,material_code)
+            # elif goods == 4:
+            #     # battery
+            #     material_list = generate_plate_info_json(1,55,material_code)
+            # elif goods == 5:
+            #     # battery_lid
+            #     material_list = generate_plate_info_json(1,53,material_code)
+
+            material_list = generate_material_list_json(position)
 
             url = 'http://localhost:8088/v1/api/wms/warehouse/bin/' + str(position)
             param = {'isEmpty': 0,

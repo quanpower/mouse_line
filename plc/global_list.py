@@ -15,5 +15,5 @@ class gloVar():
     producing = False
     warehouse_put_ok = False
     warehouse_get_ok = False
-    
+    material_dict = []
 

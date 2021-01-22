@@ -171,6 +171,9 @@ def pre_produce(order_list, siemens_1500, glock):
 
 def produce(glock):
     siemens_1500 =  gloVar.siemens_1500
+
+    gloVar.material_dict = material_dict
+
     while True:
         order_list = get_order_list()
         if not gloVar.producing :
