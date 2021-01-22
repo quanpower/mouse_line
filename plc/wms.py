@@ -470,7 +470,7 @@ async def update_warehouse_bin(bin_id: int, q: Optional[str] = None):
     # material_dict = get_material_dict
     # material_code = get_material_code(material_dict, bin_id)
     # print(material_code)
-    materialList= generate_material_list_json()
+    materialList= generate_material_list_json(bin_id)
     query = warehouse.update().where(warehouse.c.id==bin_id).values(isEmpty=isEmpty, materialList=materialList)
     last_record_id = await database.execute(query)
 

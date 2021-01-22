@@ -178,6 +178,5 @@ def produce(glock):
         order_list = get_order_list()
         if not gloVar.producing :
             pre_produce(order_list, siemens_1500, glock)
-
-        time.sleep(100)
+        time.sleep(60)
 
