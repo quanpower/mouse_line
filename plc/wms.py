@@ -129,6 +129,7 @@ async def startup():
 async def shutdown():
     await database.disconnect()
 
+# 初始化数据库列表
 @app.post("/v1/api/wms/materials/init")
 async def materials_init():
     query = materials.insert().values(generate_materials_list())
@@ -173,6 +174,7 @@ async def material_storage_init():
         "data" : {"id": last_record_id}
     }
 
+# 物料对应储位列表
 @app.get("/v1/api/wms/material_storage")
 async def get_material_storage():
     query = material_storage.select()
@@ -184,49 +186,8 @@ async def get_material_storage():
         "data" : result
     }
 
-@app.post("/v1/api/wms/warehouse/version")
-async def create_warehouse_version():
-    query = warehouse_version.insert().values(created_date=datetime.datetime.now())
-    last_record_id = await database.execute(query)
 
-    return {
-        "code" : 0,
-        "message" : "数据处理成功！",
-        "data" : {"id": last_record_id}
-    }
-
-@app.get("/v1/api/wms/warehouse/version")
-async def get_warehouse_version():
-    query = warehouse_version.select()
-    result = await database.fetch_all(query)
-
-    return {
-        "code" : 0,
-        "message" : "数据处理成功！",
-        "data" : result
-    }
-
-@app.post("/v1/api/wms/line_storage/version")
-async def create_line_storage_version():
-    query = linestorage_version.insert().values(created_date=datetime.datetime.now())
-    last_record_id = await database.execute(query)
-
-    return {
-        "code" : 0,
-        "message" : "数据处理成功！",
-        "data" : {"id": last_record_id}
-    }
-
-@app.get("/v1/api/wms/line_storage/version")
-async def get_line_storage_version():
-    query = linestorage_version.select()
-    result = await database.fetch_all(query)
-    return {
-        "code" : 0,
-        "message" : "数据处理成功！",
-        "data" : result
-    }
-
+# 立库储位，版本
 @app.get("/v1/api/wms/warehouse/snapshot/list")
 async def get_warehouse_snapshot(ver: Optional[int] = None):
     ver_query = warehouse_version.select().order_by(warehouse_version.c.id.desc())
@@ -304,6 +265,30 @@ async def update_warehouse_bin(bin_id: int, plate: WHPlate, q: Optional[str] = N
     }
     return return_json
 
+
+@app.post("/v1/api/wms/warehouse/version")
+async def create_warehouse_version():
+    query = warehouse_version.insert().values(created_date=datetime.datetime.now())
+    last_record_id = await database.execute(query)
+
+    return {
+        "code" : 0,
+        "message" : "数据处理成功！",
+        "data" : {"id": last_record_id}
+    }
+
+@app.get("/v1/api/wms/warehouse/version")
+async def get_warehouse_version():
+    query = warehouse_version.select()
+    result = await database.fetch_all(query)
+
+    return {
+        "code" : 0,
+        "message" : "数据处理成功！",
+        "data" : result
+    }
+
+# 线边库储位，版本
 @app.get("/v1/api/wms/line_storage/snapshot/list")
 async def get_line_storage_snapshot(ver: Optional[int] = None):
     ver_query = linestorage_version.select().order_by(linestorage_version.c.id.desc())
@@ -381,6 +366,27 @@ async def update_line_storage_bin(bin_id: int, plate: LSPlate, q: Optional[str] 
     }
     return return_json
 
+@app.post("/v1/api/wms/line_storage/version")
+async def create_line_storage_version():
+    query = linestorage_version.insert().values(created_date=datetime.datetime.now())
+    last_record_id = await database.execute(query)
+    return {
+        "code" : 0,
+        "message" : "数据处理成功！",
+        "data" : {"id": last_record_id}
+    }
+
+@app.get("/v1/api/wms/line_storage/version")
+async def get_line_storage_version():
+    query = linestorage_version.select()
+    result = await database.fetch_all(query)
+    return {
+        "code" : 0,
+        "message" : "数据处理成功！",
+        "data" : result
+    }
+
+# 生产订单列表
 @app.put("/v1/api/order/produce/list")
 async def update_order_list(order: Order):
     orders = order.orders
@@ -401,7 +407,7 @@ async def produce_test():
         "data" : {"produce": 'started!' }
     }
 
-
+# fake
 @app.put("/v1/api/wms/warehouse/fake/{bin_id}")
 async def update_warehouse_bin(bin_id: int, q: Optional[str] = None):
     isEmpty = 0

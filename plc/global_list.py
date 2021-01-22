@@ -19,6 +19,7 @@ class gloVar():
     warehouse_put_ok = False
     line_get_ok_list = []
     line_put_ok_list = []
+    plate_check_list = []
     
     # z2_get_ok = False
     # z2_put_ok = False

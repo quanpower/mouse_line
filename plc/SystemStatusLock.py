@@ -30,6 +30,7 @@ def query_system_status(glock):
                     bitArrayB = int2bitarray(status_b, 32)
                     bitArrayA.extend(bitArrayB)
                     wssArray = bitArrayA[0:52]
+
                     # 取件，放件完成
                     robot_put_get_done_status = siemens_1500.query_block_from_plc(40,8,3)
                     rpgds = struct.unpack('>3B', robot_put_get_done_status)
@@ -66,9 +67,15 @@ def query_system_status(glock):
                     # print('===camera_trigger===')
                     camera_triggers = int2bitarray(ct[0], 8)
                     # print(camera_triggers)
-
                     # 准备完成
                     ready_ok = camera_triggers[7]
+
+                    # 托盘检测
+                    plate_check = siemens_1500.query_block_from_plc(38,5,1)
+                    pc =struct.unpack('>B', plate_check)
+                    # print('===plate_check===')
+                    plate_check_list = int2bitarray(pc[0], 8)
+                    # print(plate_check_list)
 
                     robot_status = siemens_1500.query_block_from_plc(38,16,28)
                     rs =struct.unpack('>14H', robot_status)
@@ -89,7 +96,6 @@ def query_system_status(glock):
                     r4_plate_1 = rs[11]
                     r4_plate_2 = rs[12]
                     r7_plate = rs[13]
-
 
                     logger.info('=====warehouse_senser_status======')
                     logger.info(wss)
@@ -114,9 +120,9 @@ def query_system_status(glock):
                     gloVar.warehouse_get_ok = warehouse_get_ok
                     gloVar.warehouse_put_ok = warehouse_put_ok
 
-
                     gloVar.line_get_ok_list = line_get_ok_list
                     gloVar.line_put_ok_list = line_put_ok_list
+                    gloVar.plate_check_list = plate_check_list
 
                     # gloVar.z3_get_ok = z3_get_ok
                     # gloVar.z3_put_ok = z3_put_ok
@@ -131,7 +137,6 @@ def query_system_status(glock):
                     # gloVar.z7_put_ok = z7_put_ok  
 
                     gloVar.producing = producing
-
                     
                 except Exception as e:
                     print(e)

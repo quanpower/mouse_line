@@ -171,7 +171,13 @@ def pre_produce(order_list, siemens_1500, glock):
         thread_load.start()
 
 def pre_unload():
-    pass
+
+    positionByte = 2
+    enableByte = 1
+    enableBit = 0
+    enable = 1
+    thread_unload = threading.Thread(name="thread_unload", target=unload_action, args=(siemens_1500, positionByte, position, enableByte, enableBit, enable, glock))
+    thread_unload.start()
 
 def pre_out():
     pass
@@ -192,8 +198,8 @@ def unload_trigger(glock):
     while True:
         trigger_list = [gloVar.z2_get_ok, gloVar.z3_get_ok, gloVar.z4_get_ok, gloVar.z5_get_ok, gloVar.z6_get_ok, gloVar.z7_get_ok]
         quantity_list = [] 
-        if not gloVar.producing:
-            pre_unload(order_list, siemens_1500, glock)
+        if any gloVar.line_get_ok_list:
+            pre_unload(siemens_1500, glock)
         time.sleep(0.2)
 
 def out_trigger(glock):

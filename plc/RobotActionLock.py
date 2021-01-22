@@ -14,6 +14,19 @@ from utils import generate_plate_info_json, get_material_dict, \
 logger = logging.getLogger(__name__)
 
 
+
+mes_warehouse_snapshot_url ="http://172.16.1.62/aim-mes/open-api/wms/snapshot/v1/list"
+mes_line_storage_snapshot_url ="http://172.16.1.62/aim-mes/open-api/wms-line/snapshot/v1/list"
+
+warehouse_snapshot_url = "http://localhost:8088/v1/api/wms/warehouse/snapshot/list"
+line_storage_snapshot_url = "http://localhost:8088/v1/api/wms/line_storage/snapshot/list"
+
+warehouse_bin_url = "http://localhost:8088/v1/api/wms/warehouse/bin/"
+line_storage_bin_url = "http://localhost:8088/v1/api/wms/line_storage/bin/"
+
+warehouse_version_url = "http://localhost:8088/v1/api/wms/warehouse/version"
+line_storage_version_url = "http://localhost:8088/v1/api/wms/line_storage/version"
+
 def dont_do_anything():
     pass
 
@@ -23,6 +36,34 @@ def get_material_code(position):
     for key,value in material_dict.items():
         if str(position) in value:
             return key
+
+
+def post_mes_warehouse():
+    # get 最新立库信息
+    warehouse_snapshot = requests.get(warehouse_snapshot_url)
+    warehouse_snapshot_json = warehouse_snapshot.json()
+    warehouse_snapshot_list = warehouse_snapshot_json['data']
+    print('====warehouse_snapshot_list.json()====')
+    print(warehouse_snapshot_list.json())
+    # post到MES
+    mes_warehouse_snapshot_post = requests.post(mes_warehouse_snapshot_url,data=warehouse_snapshot_list)
+    #response = r.json()
+    print ('=====mes_warehouse_snapshot_post.text====')
+    print (mes_warehouse_snapshot_post.text)
+
+
+def post_mes_line_storage():
+    # get 最新线边库
+    line_storage_snapshot = requests.get(line_storage_snapshot_url)
+    line_storage_snapshot_json = line_storage_snapshot.json()
+    line_storage_snapshot_list = line_storage_snapshot_json['data']                
+    print('=====line_storage_snapshot_list.json()=====')
+    print(line_storage_snapshot_list.json())
+    # post MES
+    mes_line_storage_snapshot_post = requests.post(mes_line_storage_snapshot_url,data=line_storage_snapshot_list)
+    #response = r.json()
+    print ('=====mes_line_storage_snapshot_post.text=====')                
+    print (mes_line_storage_snapshot_post.text) 
 
 
 def in_action(siemens_1500, positionByte, position, enableByte, enableBit, enable, goods, glock):
@@ -146,8 +187,8 @@ def load_action(siemens_1500, positionByte,noByte,quantityByte, enableByte, enab
         line_no = generate_linestorage_no(position)
         line_trigger = gloVar.line_put_ok_list[line_no-1]
 
-        warehouse_url = 'http://localhost:8088/v1/api/wms/warehouse/bin/' + str(position)
-        line_storage_url = 'http://localhost:8088/v1/api/wms/line_storage/bin/' + str(line_no)
+        warehouse_url = warehouse_bin_url + str(position)
+        line_storage_url = line_storage_bin_url + str(line_no)
 
         r = requests.get(warehouse_url)
         return_json = r.json()
@@ -186,22 +227,26 @@ def load_action(siemens_1500, positionByte,noByte,quantityByte, enableByte, enab
                 param = {'isEmpty': 1,
                 'materialList': material_list
                 }
-
                 payload = json.dumps(param)
                 response_put = requests.put(warehouse_url, data=payload)
+                print('=====response_put.json()====')
+                print(response_put.json())
+                
+                post_mes_warehouse()
 
             if line_trigger:
                 # 放件完成，更新线边库,
-
                 material_list = generate_null_material_list_json(position)
-
                 param = {'isEmpty': 0,
                 'materialList': source_material_list,
                 'source': position
                 }
-
                 payload = json.dumps(param)
                 response_put = requests.put(line_storage_url, data=payload)
+                print('=====response_put.json()====')
+                print(response_put.json())
+
+                post_mes_line_storage()             
 
                 break
 
@@ -221,19 +266,31 @@ def unload_action(siemens_1500, positionByte, position, enableByte, enableBit, e
     logger.info('---in action----start-----')
     print('---in action----start-----')
     print(datetime.datetime.now())
-    with glock:
-        siemens_1500.write_int_to_plc(38, positionByte, position)
-        time.sleep(0.1)
-        siemens_1500.write_bool_to_plc(38, enableByte, enableBit, enable)
+    # with glock:
+    #     siemens_1500.write_int_to_plc(38, positionByte, position)
+    #     time.sleep(0.1)
+    #     siemens_1500.write_bool_to_plc(38, enableByte, enableBit, enable)
     logger.info(position)
     logger.info('---in action---end-------')
     print('---in action---end-------')
 
     i = 0
     while True:
+
+        line_trigger = gloVar.line_put_ok_list[line_no-1]
+
+        warehouse_url = warehouse_bin_url + str(position)
+        line_storage_url = line_storage_bin_url + str(line_no)
+
+        r = requests.get(line_storage_url)
+        return_json = r.json()
+        source_material_list = return_json['data']
+
+        if line_trigger:
+            post_mes_line_storage()
+
         if gloVar.warehouse_put_ok:
             # 放件完成，更新入库
-
             material_code = get_material_code(position)
             print(material_code)
             print(gloVar.robot_status[8])
@@ -242,11 +299,14 @@ def unload_action(siemens_1500, positionByte, position, enableByte, enableBit, e
 
             url = 'http://localhost:8088/v1/api/wms/warehouse/bin/' + str(position)
             param = {'isEmpty': 0,
-            'materialList': material_list
+            'materialList': source_material_list
             }
 
             payload = json.dumps(param)
             response_put = requests.put(url, data=payload)
+
+            post_mes_warehouse()
+
             break
         
         i += 1
