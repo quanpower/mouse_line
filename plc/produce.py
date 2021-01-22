@@ -215,7 +215,7 @@ def load_trigger(glock):
         order_list = get_order_list()
         if gloVar.producing :
             pre_produce(order_list, siemens_1500, glock)
-        time.sleep(60)
+        time.sleep(120)
 
 def unload_trigger(glock):
     siemens_1500 =  gloVar.siemens_1500

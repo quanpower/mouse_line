@@ -137,6 +137,15 @@ def query_system_status(glock):
                     # gloVar.z7_put_ok = z7_put_ok  
 
                     gloVar.producing = producing
+
+                    logger.info('\n' *3)
+                    logger.info(warehouse_get_ok)
+                    logger.info(warehouse_put_ok)
+                    logger.info(line_get_ok_list)
+                    logger.info(line_put_ok_list)
+                    logger.info(plate_check_list)
+                    logger.info(producing)
+                    print(producing)
                     
                 except Exception as e:
                     print(e)
