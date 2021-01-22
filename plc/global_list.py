@@ -21,6 +21,8 @@ class gloVar():
     line_put_ok_list = []
     plate_check_list = []
     
+    ua_order_list = []
+    
     # z2_get_ok = False
     # z2_put_ok = False
 

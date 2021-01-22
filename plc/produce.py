@@ -84,6 +84,30 @@ def get_plate_no(plate_dict):
             return no
     return 1
 
+def order_opcua(order_list):
+    seq_list = []
+    ua_order_list = []
+    for i in order_list:
+        seq_list.append(i['seq'])
+
+        seq_list_str = ','.join(seq_list)
+
+        print(seq_list_str)
+
+        pre_produce = i
+        id = pre_produce['id']
+        productCode = pre_produce['productCode']
+        seq = pre_produce['seq']
+        materialList = pre_produce['materialList']
+        signType = pre_produce['signType']
+        signValue = pre_produce['signValue']
+
+        order_dict = {'orderNo': seq, 'productNo': productNo, 'state': 0, 'duration': 0}
+        ua_order_list.append(order_dict)
+        
+    gloVar.ua_order_list = ua_order_list
+
+
 def pre_produce(order_list, siemens_1500, glock):
     
     global material_dict
