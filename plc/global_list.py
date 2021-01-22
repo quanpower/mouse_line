@@ -12,8 +12,28 @@ class gloVar():
     category = 'B'
     quantity = 0
     ready_ok = False
-    producing = False
-    warehouse_put_ok = False
-    warehouse_get_ok = False
+
     material_dict = []
+    
+    warehouse_get_ok = False
+    warehouse_put_ok = False
+    line_get_ok_list = []
+    line_put_ok_list = []
+    
+    # z2_get_ok = False
+    # z2_put_ok = False
+
+    # z3_get_ok = False
+    # z3_put_ok = False
+    # z4_get_ok = False
+    # z4_put_ok = False         
+    # z5_get_ok = False
+    # z5_put_ok = False
+    # z6_get_ok = False
+    # z6_put_ok = False 
+
+    # z7_get_ok = False
+    # z7_put_ok = False  
+
+    producing = False
 

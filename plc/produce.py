@@ -11,7 +11,7 @@ from utils import get_material_dict
 warehouse_bin_uri = 'http://localhost:8088/v1/api/wms/warehouse/bin/'
 
 material_dict = get_material_dict()
-print(material_dict)
+# print(material_dict)
 
 def return_materials_position():
 
@@ -60,7 +60,6 @@ def return_materials_position():
     return materials_position
 
 def return_locator_code(locatorList):
-
     for j in locatorList:
         index = int(j)
         # print(index)
@@ -72,13 +71,17 @@ def get_order_list():
     uri = 'http://172.16.1.62/aim-mes/open-api/order/produce/v1/list'
     r = requests.get(uri)
     return_json = r.json()
-    # print(return_json)
     order_list = return_json['data']
-    # print(order_list)
 
     sorted_order_list = sorted(order_list, key=operator.itemgetter('seq'))
-    print(sorted_order_list)
+    # print(sorted_order_list)
     return sorted_order_list
+
+def get_plate_no(plate_dict):
+    for key,value in plate_dict.items():
+        no = int(key)
+        if value != 'null':
+            return no
 
 def pre_produce(order_list, siemens_1500, glock):
     
@@ -110,12 +113,14 @@ def pre_produce(order_list, siemens_1500, glock):
     for i in materialList:
         materialCode = i['materialCode']
         locatorList = material_dict[materialCode]
-        print('\n'*3)
-        print(locatorList)
+        # print('\n'*3)
+        # print(locatorList)
         locatorCode = return_locator_code(locatorList)
-        print('===locatorCode===')
-        print(locatorCode)
+        # print('===locatorCode===')
+        # print(locatorCode)
         positions.append(locatorCode)
+
+    print('\n'*3)
     print('===positions===')
     print(positions)
 
@@ -125,37 +130,33 @@ def pre_produce(order_list, siemens_1500, glock):
         if position:
             r = requests.get(warehouse_bin_uri + str(position))
             return_json = r.json()
-            print(return_json)
+            # print(return_json)
 
             warehouse_bin = return_json['data']
-            print(warehouse_bin)
-            material_dict = json.loads(warehouse_bin[0]['materialList'])
-            print('====material_dict===')
-            print(material_dict)
+            plate_dict = json.loads(warehouse_bin[0]['materialList'])
+            # print('====plate_dict===')
+            # print(plate_dict)
 
-            for key,value in material_dict.items():
-                no = int(key)
-                if value != 'null':
-                    return 
+            no = get_plate_no(plate_dict)
+            length = len(plate_dict.items())
 
-            print(position)
-            print(no)
+            # print(position)
+            # print(no)
+            # print(length)
 
-            length = len(material_dict.items())
-            print(length)
-
-            quantity = length - no
+            quantity = length - no +1
 
             out = {
                 'position': position,
                 'no': no,
                 'quantity': quantity
             }
-            print(out)
+            # print(out)
 
             if quantity > 0:
                 out_list.append(out)
 
+    print('=========out_list========')
     print(out_list)
 
     positionByte = 6
@@ -166,10 +167,10 @@ def pre_produce(order_list, siemens_1500, glock):
     enable = 1
 
     if out_list:
-        thread_load = threading.Thread(name="thread_load", target=load_action, args=(siemens_1500, positionByte,noByte,quantityByte, enableByte, enableBit, enable,out_list, glock))
+        thread_load = threading.Thread(name="thread_load", target=load_action, args=(siemens_1500, positionByte,noByte,quantityByte, enableByte, enableBit, enable, out_list, glock))
         thread_load.start()
 
-def produce(glock):
+def load_trigger(glock):
     siemens_1500 =  gloVar.siemens_1500
 
     gloVar.material_dict = material_dict
@@ -180,3 +181,18 @@ def produce(glock):
             pre_produce(order_list, siemens_1500, glock)
         time.sleep(60)
 
+def unload_trigger(glock):
+    siemens_1500 =  gloVar.siemens_1500
+    while True:
+        order_list = get_order_list()
+        if not gloVar.producing :
+            pre_produce(order_list, siemens_1500, glock)
+        time.sleep(0.2)
+
+def out_trigger(glock):
+    siemens_1500 =  gloVar.siemens_1500
+    while True:
+        order_list = get_order_list()
+        if not gloVar.producing :
+            pre_produce(order_list, siemens_1500, glock)
+        time.sleep(1)

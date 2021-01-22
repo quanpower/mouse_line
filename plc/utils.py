@@ -91,6 +91,18 @@ def generate_plate_info_json(start, end, materialCode):
     return temp_json
 
 
+def generate_unload_plate_info_json(start, end, materialCode):
+    temp_dict = {}
+    for i in range(1, start):
+        temp_dict[str(i)] = 'null'
+    for i in range(start, end):
+        temp_dict[str(i)] = materialCode
+    # print(temp_dict)
+    temp_json = json.dumps(temp_dict)
+    # print(temp_json)
+
+    return temp_json
+
 def generate_warehouse_info():
     box_json = generate_plate_info_json(1,7,'Na01.01') 
 
@@ -318,15 +330,39 @@ def generate_line_storage_info_init():
     line_storage6_json = generate_plate_info_json(1,7,'null')
 
     lineStorageValues = [
-        {"id":1, "lineStorageCode": "LineStorage1", "isEmpty":True, "materialList":line_storage1_json},
-        {"id":2, "lineStorageCode": "LineStorage2", "isEmpty":True, "materialList":line_storage2_json},
-        {"id":3, "lineStorageCode": "LineStorage3", "isEmpty":True, "materialList":line_storage3_json},
-        {"id":4, "lineStorageCode": "LineStorage4", "isEmpty":True, "materialList":line_storage4_json},
-        {"id":5, "lineStorageCode": "LineStorage5", "isEmpty":True, "materialList":line_storage5_json},
-        {"id":6, "lineStorageCode": "LineStorage6", "isEmpty":True, "materialList":line_storage6_json},   
+        {"id":1, "lineStorageCode": "LineStorage1", "isEmpty":True, "materialList":line_storage1_json, "source":0},
+        {"id":2, "lineStorageCode": "LineStorage2", "isEmpty":True, "materialList":line_storage2_json, "source":0},
+        {"id":3, "lineStorageCode": "LineStorage3", "isEmpty":True, "materialList":line_storage3_json, "source":0},
+        {"id":4, "lineStorageCode": "LineStorage4", "isEmpty":True, "materialList":line_storage4_json, "source":0},
+        {"id":5, "lineStorageCode": "LineStorage5", "isEmpty":True, "materialList":line_storage5_json, "source":0},
+        {"id":6, "lineStorageCode": "LineStorage6", "isEmpty":True, "materialList":line_storage6_json, "source":0},   
     ]
     print(lineStorageValues)
     return lineStorageValues
+
+def generate_linestorage_no(bin_id):
+    if bin_id >= 1 and bin_id <= 6 or bin_id >= 27 and bin_id <= 32:
+        # 包装盒
+        line_no = 6
+    elif bin_id >= 7 and bin_id <= 12 or bin_id >= 33 and bin_id <= 38:
+        # 下盖
+        line_no = 1
+    elif bin_id >= 13 and bin_id <= 18 or bin_id >= 39 and bin_id <= 44:
+        # 中盖
+        line_no = 2
+    elif bin_id >= 19 and bin_id <= 24 or bin_id >= 45 and bin_id <= 50:
+        # 上盖
+        line_no = 3
+    elif bin_id == 25 or bin_id == 51:
+        # 电池
+        line_no = 4
+    elif bin_id == 26 or bin_id == 52:
+        # 电池盖
+        line_no = 5
+    else:
+        line_no = 0
+
+    return line_no                      
 
 
 def get_material_dict():
@@ -389,6 +425,113 @@ def generate_material_list_json(bin_id):
         materialList = generate_plate_info_json(1,10, "Za03.05")
     elif bin_id >= 49 and bin_id <= 50:
         materialList = generate_plate_info_json(1,10, "Za03.06") 
+
+    else:
+        print('unknown!')
+
+    print(materialList)
+
+    return materialList
+
+
+def generate_unload_material_list_json(quantity, bin_id):
+    
+    if bin_id >= 1 and bin_id <= 6 or bin_id >= 27 and bin_id <= 32:
+        materialList = generate_unload_plate_info_json(quantity,7, 'Na01.01') 
+    elif bin_id >= 7 and bin_id <= 8:
+        materialList = generate_unload_plate_info_json(quantity,10, "Za01.01") 
+    elif bin_id >= 9 and bin_id <= 10:
+        materialList = generate_unload_plate_info_json(quantity,10, "Za01.02")
+    elif bin_id >= 11 and bin_id <= 12:
+        materialList = generate_unload_plate_info_json(quantity,10, "Za01.03")  
+    elif bin_id >= 13 and bin_id <= 14:
+        materialList = generate_unload_plate_info_json(quantity,10, "Za02.01") 
+    elif bin_id >= 15 and bin_id <= 16:
+        materialList = generate_unload_plate_info_json(quantity,10, "Za02.02")
+    elif bin_id >= 17 and bin_id <= 18:
+        materialList = generate_unload_plate_info_json(quantity,10, "Za02.03") 
+    elif bin_id >= 19 and bin_id <= 20:
+        materialList = generate_unload_plate_info_json(quantity,10, "Za03.01") 
+    elif bin_id >= 21 and bin_id <= 22:
+        materialList = generate_unload_plate_info_json(quantity,10, "Za03.02")
+    elif bin_id >= 23 and bin_id <= 24:
+        materialList = generate_unload_plate_info_json(quantity,10, "Za03.03")       
+    elif bin_id == 25 or bin_id == 51:
+        materialList = generate_unload_plate_info_json(quantity,55, 'Ba01.01') 
+    elif bin_id == 26 or bin_id == 52:
+        materialList = generate_unload_plate_info_json(quantity,53, 'Ba02.04') 
+
+    elif bin_id >= 33 and bin_id <= 34:
+        materialList = generate_unload_plate_info_json(quantity,10, "Za01.04") 
+    elif bin_id >= 35 and bin_id <= 36:
+        materialList = generate_unload_plate_info_json(quantity,10, "Za01.05")
+    elif bin_id >= 37 and bin_id <= 38:
+        materialList = generate_unload_plate_info_json(quantity,10, "Za01.06")  
+    elif bin_id >= 39 and bin_id <= 40:
+        materialList = generate_unload_plate_info_json(quantity,10, "Za01.04") 
+    elif bin_id >= 41 and bin_id <= 42:
+        materialList = generate_unload_plate_info_json(quantity,10, "Za01.05")
+    elif bin_id >= 43 and bin_id <= 44:
+        materialList = generate_unload_plate_info_json(quantity,10, "Za01.06") 
+    elif bin_id >= 45 and bin_id <= 46:
+        materialList = generate_unload_plate_info_json(quantity,10, "Za03.04") 
+    elif bin_id >= 47 and bin_id <= 48:
+        materialList = generate_unload_plate_info_json(quantity,10, "Za03.05")
+    elif bin_id >= 49 and bin_id <= 50:
+        materialList = generate_unload_plate_info_json(quantity,10, "Za03.06") 
+
+    else:
+        print('unknown!')
+
+    print(materialList)
+
+    return materialList
+
+def generate_null_material_list_json(bin_id):
+    
+    if bin_id >= 1 and bin_id <= 6 or bin_id >= 27 and bin_id <= 32:
+        materialList = generate_plate_info_json(1,7, 'null') 
+    elif bin_id >= 7 and bin_id <= 8:
+        materialList = generate_plate_info_json(1,10, "null") 
+    elif bin_id >= 9 and bin_id <= 10:
+        materialList = generate_plate_info_json(1,10, "null")
+    elif bin_id >= 11 and bin_id <= 12:
+        materialList = generate_plate_info_json(1,10, "null")  
+    elif bin_id >= 13 and bin_id <= 14:
+        materialList = generate_plate_info_json(1,10, "null") 
+    elif bin_id >= 15 and bin_id <= 16:
+        materialList = generate_plate_info_json(1,10, "null")
+    elif bin_id >= 17 and bin_id <= 18:
+        materialList = generate_plate_info_json(1,10, "null") 
+    elif bin_id >= 19 and bin_id <= 20:
+        materialList = generate_plate_info_json(1,10, "null") 
+    elif bin_id >= 21 and bin_id <= 22:
+        materialList = generate_plate_info_json(1,10, "null")
+    elif bin_id >= 23 and bin_id <= 24:
+        materialList = generate_plate_info_json(1,10, "null")       
+    elif bin_id == 25 or bin_id == 51:
+        materialList = generate_plate_info_json(1,55, 'null') 
+    elif bin_id == 26 or bin_id == 52:
+        materialList = generate_plate_info_json(1,53, 'null') 
+
+    elif bin_id >= 33 and bin_id <= 34:
+        materialList = generate_plate_info_json(1,10, "null") 
+    elif bin_id >= 35 and bin_id <= 36:
+        materialList = generate_plate_info_json(1,10, "null")
+    elif bin_id >= 37 and bin_id <= 38:
+        materialList = generate_plate_info_json(1,10, "null")  
+    elif bin_id >= 39 and bin_id <= 40:
+        materialList = generate_plate_info_json(1,10, "null") 
+    elif bin_id >= 41 and bin_id <= 42:
+        materialList = generate_plate_info_json(1,10, "null")
+    elif bin_id >= 43 and bin_id <= 44:
+        materialList = generate_plate_info_json(1,10, "null") 
+    elif bin_id >= 45 and bin_id <= 46:
+        materialList = generate_plate_info_json(1,10, "null") 
+    elif bin_id >= 47 and bin_id <= 48:
+        materialList = generate_plate_info_json(1,10, "null")
+    elif bin_id >= 49 and bin_id <= 50:
+        materialList = generate_plate_info_json(1,10, "null") 
 
     else:
         print('unknown!')

@@ -51,6 +51,7 @@ linestorage = sqlalchemy.Table(
     sqlalchemy.Column("lineStorageCode", sqlalchemy.String(20)),
     sqlalchemy.Column("isEmpty", sqlalchemy.Boolean),
     sqlalchemy.Column("materialList", sqlalchemy.Text),
+    sqlalchemy.Column("source", sqlalchemy.Integer),
 )
 
 material_storage = sqlalchemy.Table(
@@ -67,8 +68,8 @@ plateinfo = sqlalchemy.Table(
     sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
     sqlalchemy.Column("plateName", sqlalchemy.String(10)),
     sqlalchemy.Column("plateClass", sqlalchemy.String(10)),
-    sqlalchemy.Column("plateName", sqlalchemy.Integer),
-    sqlalchemy.Column("plateName", sqlalchemy.Integer),
+    sqlalchemy.Column("length", sqlalchemy.Integer),
+    sqlalchemy.Column("width", sqlalchemy.Integer),
 )
 
 warehouse_version = sqlalchemy.Table(
@@ -104,78 +105,15 @@ class OrderDetail(BaseModel):
 class Order(BaseModel):
     orders: list = []
 
-class Plate(BaseModel):
+class WHPlate(BaseModel):
     isEmpty: bool
     materialList: str
     
-order_sample={
-    "code":0,
-    "message":"string",
-    "data":[
-        {
-            "seq":"PP000001",
-            "customerCode":"SC0001",
-            "customerName":"张三",
-            "productCode":"A01",
-            "productName":"白色电池款",
-            "signType":2,
-            "signValue":"http:xxx.jpeg",
-            "materialList":[
-                {
-                    "materialCode":"Za01.01",
-                    "materialName":"白色底壳"
-                },
-                {
-                    "materialCode":"Za02.01",
-                    "materialName":"中壳"
-                },
-                {
-                    "materialCode":"Za03.01",
-                    "materialName":"白色上壳"
-                },
-                {
-                    "materialCode":"Ba01.01",
-                    "materialName":"电池"
-                },
-                {
-                    "materialCode":"Ba02.01",
-                    "materialName":"电池盖"
-                },
-                {
-                    "materialCode":"La01.01",
-                    "materialName":"公制螺丝"
-                }
-            ]
-        },
-        {
-            "seq":"PP000002",
-            "customerCode":"SC0002",
-            "customerName":"李四",
-            "productCode":"B01",
-            "productName":"白色充电款",
-            "signType":1,
-            "signValue":"开心",
-            "materialList":[
-                {
-                    "materialCode":"Za01.01",
-                    "materialName":"白色底壳"
-                },
-                {
-                    "materialCode":"Za02.01",
-                    "materialName":"中壳"
-                },
-                {
-                    "materialCode":"Za03.01",
-                    "materialName":"白色上壳"
-                },
-                {
-                    "materialCode":"La01.01",
-                    "materialName":"公制螺丝"
-                }
-            ]
-        }
-    ]
-}
+class LSPlate(BaseModel):
+    isEmpty: bool
+    materialList: str
+    source: int
+    
 
 def get_material_code(material_dict, position):
     for key,value in material_dict.items():
@@ -349,7 +287,7 @@ async def get_warehouse_bin(bin_id: int, q: Optional[str] = None):
     return return_json
 
 @app.put("/v1/api/wms/warehouse/bin/{bin_id}")
-async def update_warehouse_bin(bin_id: int, plate: Plate, q: Optional[str] = None):
+async def update_warehouse_bin(bin_id: int, plate: WHPlate, q: Optional[str] = None):
     # materialList = generate_plate_info_json(1,10,'Za01.01') 
     isEmpty = plate.isEmpty
     materialList = plate.materialList
@@ -426,11 +364,12 @@ async def get_line_storage_bin(bin_id: int, q: Optional[str] = None):
     return return_json
 
 @app.put("/v1/api/wms/line_storage/bin/{bin_id}")
-async def update_line_storage_bin(bin_id: int, plate: Plate, q: Optional[str] = None):
+async def update_line_storage_bin(bin_id: int, plate: LSPlate, q: Optional[str] = None):
     isEmpty = plate.isEmpty
     materialList = plate.materialList
+    source = plate.source 
     print(materialList)
-    query = linestorage.update().where(linestorage.c.id==bin_id).values(isEmpty=isEmpty, materialList=materialList)
+    query = linestorage.update().where(linestorage.c.id==bin_id).values(isEmpty=isEmpty, materialList=materialList, source=source)
     last_record_id = await database.execute(query)
 
     return_json = {

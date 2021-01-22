@@ -7,7 +7,9 @@ import requests
 from global_list import gloVar
 import json
 import logging
-from utils import generate_plate_info_json, get_material_dict
+from utils import generate_plate_info_json, get_material_dict, \
+    generate_material_list_json, generate_null_material_list_json, generate_linestorage_no, \
+        generate_unload_material_list_json
 
 logger = logging.getLogger(__name__)
 
@@ -35,6 +37,7 @@ def in_action(siemens_1500, positionByte, position, enableByte, enableBit, enabl
     logger.info('---in action---end-------')
     print('---in action---end-------')
 
+    i = 0
     while True:
         if gloVar.warehouse_put_ok:
             # 放件完成，更新入库
@@ -133,13 +136,25 @@ def load_action(siemens_1500, positionByte,noByte,quantityByte, enableByte, enab
     logger.info('---out action----start-----')
     print('---out action----start-----')
     print(out_list)
+
     for out in out_list:
         i = 0
+        position = out['position']
+        no = out['no']
+        quantity = out['quantity']
+
+        line_no = generate_linestorage_no(position)
+        line_trigger = gloVar.line_put_ok_list[line_no-1]
+
+        warehouse_url = 'http://localhost:8088/v1/api/wms/warehouse/bin/' + str(position)
+        line_storage_url = 'http://localhost:8088/v1/api/wms/line_storage/bin/' + str(line_no)
+
+        r = requests.get(warehouse_url)
+        return_json = r.json()
+        source_material_list = return_json['data']
+
         while 1: 
             print(datetime.datetime.now())
-            position = out['position']
-            no = out['no']
-            quantity = out['quantity']
 
             if gloVar.ready_ok:
                 print('=====output no=====')
@@ -166,16 +181,28 @@ def load_action(siemens_1500, positionByte,noByte,quantityByte, enableByte, enab
                 break
 
             if gloVar.warehouse_get_ok:
-                # 取件完成，更新出库,
-                material_list = generate_plate_info_json(1,10,'null')
-
-                url = 'http://localhost:8088/v1/api/wms/warehouse/bin/' + str(position)
+                # 取件完成，更新立库
+                material_list = generate_null_material_list_json(position)
                 param = {'isEmpty': 1,
                 'materialList': material_list
                 }
 
                 payload = json.dumps(param)
-                response_put = requests.put(url, data=payload)
+                response_put = requests.put(warehouse_url, data=payload)
+
+            if line_trigger:
+                # 放件完成，更新线边库,
+
+                material_list = generate_null_material_list_json(position)
+
+                param = {'isEmpty': 0,
+                'materialList': source_material_list,
+                'source': position
+                }
+
+                payload = json.dumps(param)
+                response_put = requests.put(line_storage_url, data=payload)
+
                 break
 
             i += 1
@@ -202,6 +229,7 @@ def unload_action(siemens_1500, positionByte, position, enableByte, enableBit, e
     logger.info('---in action---end-------')
     print('---in action---end-------')
 
+    i = 0
     while True:
         if gloVar.warehouse_put_ok:
             # 放件完成，更新入库
@@ -210,7 +238,7 @@ def unload_action(siemens_1500, positionByte, position, enableByte, enableBit, e
             print(material_code)
             print(gloVar.robot_status[8])
             # 更新数量
-            material_list = generate_plate_info_json(1,10,material_code)
+            material_list = generate_unload_material_list_json(1,10,material_code)
 
             url = 'http://localhost:8088/v1/api/wms/warehouse/bin/' + str(position)
             param = {'isEmpty': 0,
