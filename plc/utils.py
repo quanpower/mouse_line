@@ -103,6 +103,7 @@ def generate_unload_plate_info_json(start, end, materialCode):
 
     return temp_json
 
+
 def generate_warehouse_info():
     box_json = generate_plate_info_json(1,7,'Na01.01') 
 
@@ -340,6 +341,7 @@ def generate_line_storage_info_init():
     print(lineStorageValues)
     return lineStorageValues
 
+
 def generate_line_storage_info_null(lineStorageCode):
     if lineStorageCode == 1:
         line_storage_json = generate_plate_info_json(1,10,'null')
@@ -356,6 +358,7 @@ def generate_line_storage_info_null(lineStorageCode):
     else:
         print('generate_line_storage_info_null error!')
     return line_storage_json
+
 
 def generate_linestorage_no(bin_id):
     if bin_id >= 1 and bin_id <= 6 or bin_id >= 27 and bin_id <= 32:
@@ -422,7 +425,7 @@ def generate_material_list_json(bin_id):
     elif bin_id == 25 or bin_id == 51:
         materialList = generate_plate_info_json(1,55, 'Ba01.01') 
     elif bin_id == 26 or bin_id == 52:
-        materialList = generate_plate_info_json(1,53, 'Ba02.04') 
+        materialList = generate_plate_info_json(1,53, 'Ba02.05') 
 
     elif bin_id >= 33 and bin_id <= 34:
         materialList = generate_plate_info_json(1,10, "Za01.04") 
@@ -431,11 +434,11 @@ def generate_material_list_json(bin_id):
     elif bin_id >= 37 and bin_id <= 38:
         materialList = generate_plate_info_json(1,10, "Za01.06")  
     elif bin_id >= 39 and bin_id <= 40:
-        materialList = generate_plate_info_json(1,10, "Za01.04") 
+        materialList = generate_plate_info_json(1,10, "Za02.04") 
     elif bin_id >= 41 and bin_id <= 42:
-        materialList = generate_plate_info_json(1,10, "Za01.05")
+        materialList = generate_plate_info_json(1,10, "Za02.05")
     elif bin_id >= 43 and bin_id <= 44:
-        materialList = generate_plate_info_json(1,10, "Za01.06") 
+        materialList = generate_plate_info_json(1,10, "Za02.06") 
     elif bin_id >= 45 and bin_id <= 46:
         materialList = generate_plate_info_json(1,10, "Za03.04") 
     elif bin_id >= 47 and bin_id <= 48:
