@@ -13,7 +13,6 @@ logger = logging.getLogger(__name__)
 # 导入全局变量
 from global_list import gloVar
 
-
 def query_system_status(glock):
     while True:    
         try:
@@ -97,6 +96,7 @@ def query_system_status(glock):
                     r4_plate_2 = rs[12]
                     r7_plate = rs[13]
 
+                    logger.info('\n'*3)
                     logger.info('=====warehouse_senser_status======')
                     logger.info(wss)
                     logger.info(rs)
@@ -138,7 +138,6 @@ def query_system_status(glock):
 
                     gloVar.producing = producing
 
-                    logger.info('\n' *3)
                     logger.info(warehouse_get_ok)
                     logger.info(warehouse_put_ok)
                     logger.info(line_get_ok_list)

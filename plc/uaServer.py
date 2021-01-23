@@ -10,9 +10,10 @@ sys.path.insert(0, "..")
 from asyncua import ua, Server
 from asyncua.common.methods import uamethod
 
+logger = logging.getLogger(__name__)
 
-logging.basicConfig(level=logging.INFO)
-_logger = logging.getLogger('asyncua')
+# logging.basicConfig(level=logging.INFO)
+# _logger = logging.getLogger('asyncua')
 
 
 @uamethod
@@ -98,7 +99,7 @@ async def ua_main():
 
     # await server.nodes.objects.add_method(ua.NodeId('ServerMethod', 2), ua.QualifiedName('ServerMethod', 2), func, [ua.VariantType.Int64], [ua.VariantType.Int64])
     
-    _logger.info('Starting server!')
+    # _logger.info('Starting server!')
     async with server:
         while True:
             await asyncio.sleep(0.5)
@@ -106,7 +107,7 @@ async def ua_main():
 
             duration = time.time() - gloVar.startTime
 
-            _logger.info('Set value of %s to %.1f', order_1_duration, duration)
+            logger.info('Set value of %s to %.1f', order_1_duration, duration)
 
             await order_1_orderNo.write_value(gloVar.orderNo)
             await order_1_productNo.write_value(gloVar.productNo)

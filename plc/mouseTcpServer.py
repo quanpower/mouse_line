@@ -10,7 +10,7 @@ from PlcConn import plcConn
 from SystemStatusLock import query_system_status
 from RobotActionLock import in_action, out_action
 from camera import trigger_assembly_line_camara, trigger_warehouse_camara, shift_action, camera_trigger
-from produce import load_trigger, unload_trigger, out_trigger 
+from produce import load_trigger, unload_trigger, in_trigger ,out_trigger
 from uaServer import ua_main
 from laser_client import client_send
 import threading 
@@ -332,6 +332,10 @@ if __name__ == "__main__":
         # 循环读取待产订单，准备生产
         thread_load_trigger = threading.Thread(name='thread_load_trigger', target=load_trigger, args=(glock,))
         thread_load_trigger.start()
+
+        # 循环读取下料订单，准备下料
+        thread_unload_trigger = threading.Thread(name='thread_unload_trigger', target=unload_trigger, args=(glock,))
+        thread_unload_trigger.start()
 
 
         # 循环读取生产订单，上报opc ua server
