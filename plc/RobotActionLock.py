@@ -54,17 +54,16 @@ def post_mes_warehouse():
         warehouse_snapshot = requests.get(warehouse_snapshot_url)
         warehouse_snapshot_json = warehouse_snapshot.json()
         warehouse_snapshot_list = warehouse_snapshot_json['data']
-        print('====warehouse_snapshot_list.json()====')
-        print(warehouse_snapshot_list.json())
+
         logger.info('====warehouse_snapshot_list.json()====')
-        logger.info(warehouse_snapshot_list.json())
+        logger.info(warehouse_snapshot_list)
         # post到MES
         mes_warehouse_snapshot_post = requests.post(mes_warehouse_snapshot_url,data=warehouse_snapshot_list)
         #response = r.json()
         print ('=====mes_warehouse_snapshot_post.text====')
-        print (mes_warehouse_snapshot_post.text)
+        print (mes_warehouse_snapshot_post.text())
         logger.info('=====mes_warehouse_snapshot_post.text====')
-        logger.info(mes_warehouse_snapshot_post.text)
+        logger.info(mes_warehouse_snapshot_post.text())
     except Exception as e:
         logger.info ('post_mes_warehouse error') 
         logger.info (e) 
@@ -83,9 +82,9 @@ def post_mes_line_storage():
         mes_line_storage_snapshot_post = requests.post(mes_line_storage_snapshot_url, data=line_storage_snapshot_list)
         #response = r.json()
         print ('=====mes_line_storage_snapshot_post.text=====')                
-        print (mes_line_storage_snapshot_post.text) 
+        print (mes_line_storage_snapshot_post.text()) 
         logger.info ('=====mes_line_storage_snapshot_post.text=====')                
-        logger.info (mes_line_storage_snapshot_post.text) 
+        logger.info (mes_line_storage_snapshot_post.text()) 
     except Exception as e:
         logger.info ('post_mes_line_storage error') 
         logger.info (e) 
