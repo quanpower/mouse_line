@@ -182,6 +182,32 @@ def out_action(siemens_1500, positionByte,noByte,quantityByte, enableByte, enabl
     logger.info('---out action---end-------')
     print('---out action---end-------')
 
+def write_load_action():
+    print('=====output no=====')
+    print(position)
+    with glock:
+        siemens_1500.write_int_to_plc(38, positionByte, position)
+        time.sleep(0.1)
+        siemens_1500.write_int_to_plc(38, noByte, no)
+        time.sleep(0.1)
+        siemens_1500.write_int_to_plc(38, quantityByte, quantity)
+        time.sleep(0.1)
+        siemens_1500.write_bool_to_plc(38, enableByte, enableBit, enable)
+        # 写入订单号，产品号
+        write_string_to_plc(siemens_1500, seq, 98 )
+        write_string_to_plc(siemens_1500, productCode, 354 )
+
+        print(positionByte)
+        print(enableByte)
+        print(enableBit)
+        print(enable)
+
+    time.sleep(10)
+
+    # 出库使能复位
+    with glock:
+        siemens_1500.write_bool_to_plc(38, enableByte, enableBit, 0)
+    logger.info(position)
 
 def load_action(siemens_1500, positionByte,noByte,quantityByte, enableByte, enableBit, enable, out_list, seq, productCode, glock):
     logger.info('---out action----start-----')
@@ -205,40 +231,50 @@ def load_action(siemens_1500, positionByte,noByte,quantityByte, enableByte, enab
 
         print('======source_material_list=====')
         print(source_material_list)
+
+        # PLC指令写一次
+        can_write_flag = True
+        # 上料流程
         while 1: 
             # print(datetime.datetime.now())
             # 发给PLC机器人移动指令
+            logger.info('====gloVar.ready_ok====')
+            logger.info(gloVar.ready_ok)
             if gloVar.ready_ok:
                 print('=====output no=====')
-                print(position)
-                with glock:
-                    siemens_1500.write_int_to_plc(38, positionByte, position)
-                    time.sleep(0.1)
-                    siemens_1500.write_int_to_plc(38, noByte, no)
-                    time.sleep(0.1)
-                    siemens_1500.write_int_to_plc(38, quantityByte, quantity)
-                    time.sleep(0.1)
-                    siemens_1500.write_bool_to_plc(38, enableByte, enableBit, enable)
-                    # 写入订单号，产品号
-                    write_string_to_plc(siemens_1500, seq, 98 )
-                    write_string_to_plc(siemens_1500, productCode, 354 )
-
-                    print(positionByte)
-                    print(enableByte)
-                    print(enableBit)
-                    print(enable)
-
-                # time.sleep(3)
-
-                # 出库使能复位
-                with glock:
-                    siemens_1500.write_bool_to_plc(38, enableByte, enableBit, 0)
                 logger.info(position)
+                print(position)
+                
+                if can_write_flag:
+                    with glock:
+                        siemens_1500.write_int_to_plc(38, positionByte, position)
+                        time.sleep(0.1)
+                        siemens_1500.write_int_to_plc(38, noByte, no)
+                        time.sleep(0.1)
+                        siemens_1500.write_int_to_plc(38, quantityByte, quantity)
+                        time.sleep(0.1)
+                        siemens_1500.write_bool_to_plc(38, enableByte, enableBit, enable)
+                        # 写入订单号，产品号
+                        write_string_to_plc(siemens_1500, seq, 98 )
+                        write_string_to_plc(siemens_1500, productCode, 354 )
+
+                        print(positionByte)
+                        print(enableByte)
+                        print(enableBit)
+                        print(enable)
+                    # time.sleep(10)
+                can_write_flag = False
+                # thread_write_load_action = threading.Thread(name='thread_write_load_action', target=write_load_action, args=(siemens_1500, positionByte,noByte,quantityByte, enableByte, enableBit, enable, out_list, seq, productCode, glock))
+                # thread_write_load_action.start()
 
             logger.info('====gloVar.warehouse_get_ok====')
             logger.info(gloVar.warehouse_get_ok)
 
             if gloVar.warehouse_get_ok:
+                with glock:
+                    # 出库使能复位
+                    siemens_1500.write_bool_to_plc(38, enableByte, enableBit, 0)
+
                 # 取件完成，更新立库
                 material_list = generate_null_material_list_json(position)
                 param = {'isEmpty': 1,
@@ -252,7 +288,6 @@ def load_action(siemens_1500, positionByte,noByte,quantityByte, enableByte, enab
                 # post mes
                 post_mes_warehouse()
             
-
             line_trigger = gloVar.line_put_ok_list[line_no-1]
             logger.info('==line_trigger====')
             logger.info(line_trigger)
@@ -269,7 +304,9 @@ def load_action(siemens_1500, positionByte,noByte,quantityByte, enableByte, enab
                 print(response_put.json())
                 
                 # post mes
-                post_mes_line_storage()             
+                post_mes_line_storage() 
+
+
 
                 break
 
