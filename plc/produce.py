@@ -107,7 +107,7 @@ def order_opcua(order_list):
     gloVar.ua_order_list = ua_order_list
 
 
-def pre_produce(order_list, siemens_1500, glock):
+def pre_load(order_list, siemens_1500, glock):
     
     global material_dict
 
@@ -202,12 +202,12 @@ def pre_produce(order_list, siemens_1500, glock):
         thread_load.start()
 
 
-def pre_unload(siemens_1500, glock):
+def pre_unload(siemens_1500, index,glock):
     positionByte = 2
     enableByte = 1
     enableBit = 0
     enable = 1
-    thread_unload = threading.Thread(name="thread_unload", target=unload_action, args=(siemens_1500, positionByte, position, enableByte, enableBit, enable, glock))
+    thread_unload = threading.Thread(name="thread_unload", target=unload_action, args=(siemens_1500,index, positionByte,  enableByte, enableBit, enable, glock))
     thread_unload.start()
 
 def pre_out():
@@ -220,31 +220,28 @@ def load_trigger(glock):
 
     while True:
         order_list = get_order_list()
-        order_opcua(order_list)
-        
         if gloVar.producing:
-            pre_produce(order_list, siemens_1500, glock)
+            pre_load(order_list, siemens_1500, glock)
         time.sleep(10)
 
 def unload_trigger(glock):
     siemens_1500 =  gloVar.siemens_1500
-    line_storage_bin_url = "http://localhost:8088/v1/api/wms/line_storage/bin/"
 
     while True:
         if any(gloVar.line_get_ok_list):
-            index = gloVar.line_get_ok_list.index(True)
-            r = requests.get(line_storage_bin_url + str(index))
-            return_json = r.json()
-            # print(return_json)
-
-            line_storage_bin = return_json['data']
-            print(line_storage_bin)
-            print('source is:')
-
-            pre_unload(siemens_1500, glock)
-        time.sleep(0.2)
+            index = gloVar.line_get_ok_list.index(True) + 1
+            pre_unload(siemens_1500,index, glock)
+        time.sleep(0.5)
 
 def out_trigger(glock):
+    siemens_1500 =  gloVar.siemens_1500
+    while True:
+        if False :
+            # 托盘全空
+            pre_out()
+        time.sleep(1)
+
+def in_trigger(glock):
     siemens_1500 =  gloVar.siemens_1500
     while True:
         if False :

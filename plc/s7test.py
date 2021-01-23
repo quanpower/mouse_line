@@ -9,7 +9,6 @@ Real_Value=s1500.read_area(0x84,38,0,1)
 print(Real_Value)
 
 order = '00PP000022'
-# order = '00000000000000000'
 byarray=bytearray(order,encoding='utf-8')
 
 print(byarray)

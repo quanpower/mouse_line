@@ -340,6 +340,23 @@ def generate_line_storage_info_init():
     print(lineStorageValues)
     return lineStorageValues
 
+def generate_line_storage_info_null(lineStorageCode):
+    if lineStorageCode == 1:
+        line_storage_json = generate_plate_info_json(1,10,'null')
+    elif lineStorageCode == 2:
+        line_storage_json = generate_plate_info_json(1,10,'null')
+    elif lineStorageCode == 3:
+        line_storage_json = generate_plate_info_json(1,10,'null')
+    elif lineStorageCode == 4:
+        line_storage_json = generate_plate_info_json(1,55,'null')
+    elif lineStorageCode == 5:
+        line_storage_json = generate_plate_info_json(1,53,'null')
+    elif lineStorageCode == 6:
+        line_storage_json = generate_plate_info_json(1,7,'null')
+    else:
+        print('generate_line_storage_info_null error!')
+    return line_storage_json
+
 def generate_linestorage_no(bin_id):
     if bin_id >= 1 and bin_id <= 6 or bin_id >= 27 and bin_id <= 32:
         # 包装盒

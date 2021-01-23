@@ -101,7 +101,7 @@ async def ua_main():
     _logger.info('Starting server!')
     async with server:
         while True:
-            await asyncio.sleep(1)
+            await asyncio.sleep(0.5)
             # new_val = await order_1_duration.get_value() + 0.1
 
             duration = time.time() - gloVar.startTime
