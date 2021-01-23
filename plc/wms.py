@@ -206,15 +206,27 @@ async def get_warehouse_snapshot(ver: Optional[int] = None):
             materialList.append(plate)
         snapshot.append({"locatorCode": i.locatorCode, "materialList": materialList})
 
+    outandin = [
+                {
+                    "action":"out",
+                    "locatorCode":"021",
+                    "materialList":[
+                        {
+                            "materialCode":"Ba01.01",
+                            "materialPlace":"3"
+                        },
+                    ],
+                }
+            ]
+
     return_json = {
         "code" : 0,
         "message" : "数据处理成功！",
-        "data" : [
-            {
+        "data" : {
             "ver":version.id,
             "snapshot":snapshot,
-            "outandin":[]  
-        }]
+            "outandin":outandin
+        }
     }
     return return_json
 
@@ -259,9 +271,7 @@ async def update_warehouse_bin(bin_id: int, plate: WHPlate, q: Optional[str] = N
     return_json = {
         "code" : 0,
         "message" : "数据处理成功！",
-        "data" : [
-            {"id": last_record_id, "bin_id": bin_id}
-        ]  
+        "data" : {"id": last_record_id, "bin_id": bin_id}
     }
     return return_json
 
@@ -307,15 +317,26 @@ async def get_line_storage_snapshot(ver: Optional[int] = None):
             materialList.append(plate)
         snapshot.append({"lineStorageCode": i.lineStorageCode, "materialList": materialList})
 
+    outandin = [
+                    {
+                        "action":"in",
+                        "lineStorageCode":"LineStorage3",
+                        "materialList":[
+                            {
+                                "materialCode":"Ba01.01",
+                                "materialPlace":"3"
+                            },
+                        ]
+                    }
+                ]
     return_json = {
         "code" : 0,
         "message" : "数据处理成功！",
-        "data" : [
-            {
-            "ver":version.id,
-            "snapshot":snapshot,
-            "outandin":[]  
-        }]
+        "data" : {
+            "ver": version.id,
+            "snapshot": snapshot,
+            "outandin": outandin 
+        }
     }
     return return_json
 
@@ -360,9 +381,7 @@ async def update_line_storage_bin(bin_id: int, plate: LSPlate, q: Optional[str] 
     return_json = {
         "code" : 0,
         "message" : "数据处理成功！",
-        "data" : [
-            {"id": last_record_id, "bin_id": bin_id}
-        ]  
+        "data" : {"id": last_record_id, "bin_id": bin_id}
     }
     return return_json
 
@@ -422,12 +441,10 @@ async def update_warehouse_bin(bin_id: int, q: Optional[str] = None):
     return_json = {
         "code" : 0,
         "message" : "数据处理成功！",
-        "data" : [
-            {"id": last_record_id, "bin_id": bin_id}
-        ]  
+        "data" : {"id": last_record_id, "bin_id": bin_id}
     }
     return return_json
 
 
 if __name__ == '__main__':
-    uvicorn.run(app=app,host="0.0.0.0",port=8088,debug=True)        
+    uvicorn.run(app=app, host="0.0.0.0", port=8088, debug=True)        

@@ -4,6 +4,7 @@ import datetime
 import struct
 from utils import int2bitarray
 import requests
+from urllib import parse
 from global_list import gloVar
 import json
 import logging
@@ -27,6 +28,8 @@ line_storage_bin_url = "http://localhost:8088/v1/api/wms/line_storage/bin/"
 warehouse_version_url = "http://localhost:8088/v1/api/wms/warehouse/version"
 line_storage_version_url = "http://localhost:8088/v1/api/wms/line_storage/version"
 
+head = {"Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"}
+
 def dont_do_anything():
     pass
 
@@ -36,6 +39,7 @@ def get_material_code(position):
     for key,value in material_dict.items():
         if str(position) in value:
             return key
+
 
 def write_string_to_plc(s1500,string2plc,start):
     s = '00' + string2plc
@@ -53,19 +57,19 @@ def post_mes_warehouse():
         warehouse_snapshot = requests.get(warehouse_snapshot_url)
         warehouse_snapshot_json = warehouse_snapshot.json()
         warehouse_snapshot_list = warehouse_snapshot_json['data']
+        requestdata = parse.urlencode(warehouse_snapshot_list)
 
-        logger.info('====warehouse_snapshot_list====')
-        logger.info(warehouse_snapshot_list)
-        # post到MES
-        mes_warehouse_snapshot_post = requests.post(mes_warehouse_snapshot_url, data=warehouse_snapshot_list)
+        # post到MES,hearers
+        mes_warehouse_snapshot_post = requests.post(mes_warehouse_snapshot_url,data=requestdata,headers=head)
         #response = r.json()
-        print ('=====mes_warehouse_snapshot_post.text====')
-        print (mes_warehouse_snapshot_post.text())
-        logger.info('=====mes_warehouse_snapshot_post.text====')
-        logger.info(mes_warehouse_snapshot_post.text())
+        print('=====mes_warehouse_snapshot_post.json()====')
+        print(mes_warehouse_snapshot_post.json())
+        logger.info('=====mes_warehouse_snapshot_post.json()====')
+        logger.info(mes_warehouse_snapshot_post.json())
     except Exception as e:
-        logger.error ('post_mes_warehouse error') 
+        logger.error ('====post_mes_warehouse error=====') 
         logger.error (e) 
+
 
 def post_mes_line_storage():
     try:
@@ -73,20 +77,18 @@ def post_mes_line_storage():
         line_storage_snapshot = requests.get(line_storage_snapshot_url)
         line_storage_snapshot_json = line_storage_snapshot.json()
         line_storage_snapshot_list = line_storage_snapshot_json['data']                
-        print('=====line_storage_snapshot_list=====')
-        print(line_storage_snapshot_list)
-        logger.info('=====line_storage_snapshot_list=====')
-        logger.info(line_storage_snapshot_list)    
-        # post MES
-        mes_line_storage_snapshot_post = requests.post(mes_line_storage_snapshot_url, data=line_storage_snapshot_list)
-        #response = r.json()
-        print ('=====mes_line_storage_snapshot_post.text=====')                
-        print (mes_line_storage_snapshot_post.text()) 
-        logger.info ('=====mes_line_storage_snapshot_post.text=====')                
-        logger.info (mes_line_storage_snapshot_post.text()) 
+        requestdata = parse.urlencode(line_storage_snapshot_list)
+
+        # post到MES,hearers
+        mes_line_storage_snapshot_post = requests.post(mes_line_storage_snapshot_url,data=requestdata,headers=head)   
+        print('=====mes_line_storage_snapshot_post.json()=====')                
+        print(mes_line_storage_snapshot_post.json()) 
+        logger.info('=====mes_line_storage_snapshot_post.json()=====')                
+        logger.info(mes_line_storage_snapshot_post.json()) 
     except Exception as e:
         logger.error ('post_mes_line_storage error') 
         logger.error (e) 
+
 
 def in_action(siemens_1500, positionByte, position, enableByte, enableBit, enable, goods, glock):
     logger.info('---in action----start-----')
@@ -245,10 +247,10 @@ def load_action(siemens_1500, positionByte,noByte,quantityByte, enableByte, enab
                         write_string_to_plc(siemens_1500, seq, 98 )
                         write_string_to_plc(siemens_1500, productCode, 354 )
 
-                        print(positionByte)
-                        print(enableByte)
-                        print(enableBit)
-                        print(enable)
+                        # print(positionByte)
+                        # print(enableByte)
+                        # print(enableBit)
+                        # print(enable)
                 can_write_flag = False
                 # thread_write_load_action = threading.Thread(name='thread_write_load_action', target=write_load_action, args=(siemens_1500, positionByte,noByte,quantityByte, enableByte, enableBit, enable, out_list, seq, productCode, glock))
                 # thread_write_load_action.start()
@@ -268,9 +270,7 @@ def load_action(siemens_1500, positionByte,noByte,quantityByte, enableByte, enab
                 }
                 payload = json.dumps(param)
                 response_put = requests.put(warehouse_url, data=payload)
-                print('=====response_put.json()====')
-                print(response_put.json())
-                logger.info('=====response_put.json()====')
+                logger.info('=====warehouse_url_response_put.json()====')
                 logger.info(response_put.json())                
                 
                 # post mes
@@ -283,20 +283,18 @@ def load_action(siemens_1500, positionByte,noByte,quantityByte, enableByte, enab
             if line_trigger:
                 # 放件完成，更新线边库,
                 param = {'isEmpty': 0,
-                'materialList': source_material_list,
+                'materialList': source_material_list[0]['materialList'],
                 'source': position
                 }
                 payload = json.dumps(param)
 
-                logger.warning('====line_storage_update_error===')
-                logger.warning(payload)
+                logger.info('====line_storage_update_payload===')
+                logger.info(payload)
 
                 try:
                     response_put = requests.put(line_storage_url, data=payload)
-                    print('=====response_put====')
-                    print(response_put)
-                    logger.info('=====response_put====')
-                    logger.info(response_put)                
+                    logger.info('=====line_storage_url_response_put.json()====')
+                    logger.info(response_put.json())                
                 except Exception as e:
                     logger.error('=====line_storage_update_error====')
                     logger.error(e)
@@ -321,8 +319,8 @@ def load_action(siemens_1500, positionByte,noByte,quantityByte, enableByte, enab
 
 def unload_action(siemens_1500, index, positionByte, enableByte, enableBit, enable, glock):
     logger.info('---unload action----start-----')
+    logger.info(datetime.datetime.now())
     print('---unload action----start-----')
-    print(datetime.datetime.now())
     # with glock:
     #     siemens_1500.write_int_to_plc(38, positionByte, position)
     #     time.sleep(0.1)
@@ -335,16 +333,15 @@ def unload_action(siemens_1500, index, positionByte, enableByte, enableBit, enab
     line_storage_url = line_storage_bin_url + str(index)
     r = requests.get(line_storage_url)
     return_json = r.json()
-    # print(return_json)
-
     line_storage_bin = return_json['data']
     # print(line_storage_bin)
     materialList = line_storage_bin[0]['materialList']
     source = line_storage_bin[0]['source']
-    print('source is:')
-    print(source)
-    print('materialList is:')
-    print(materialList)   
+
+    logger.info('source is:')
+    logger.info(source)
+    logger.info('materialList is:')
+    logger.info(materialList)   
     
     # 更新线边库
     nullMaterialList = generate_line_storage_info_null(index)
@@ -354,7 +351,12 @@ def unload_action(siemens_1500, index, positionByte, enableByte, enableBit, enab
     }
 
     payload = json.dumps(param)
+    logger.info('====line_storage_info_null_payload====')
+    logger.info(payload)
+
     response_put = requests.put(line_storage_url, data=payload)
+    logger.info('line_storage_info_null response_put')
+    logger.info(response_put.json())
 
     # POST MES
     post_mes_line_storage()
@@ -370,7 +372,7 @@ def unload_action(siemens_1500, index, positionByte, enableByte, enableBit, enab
 
             payload = json.dumps(param)
             response_put = requests.put(url, data=payload)
-
+            # POST MES
             post_mes_warehouse()
 
             break

@@ -18,61 +18,6 @@ from global_list import gloVar
 material_dict = get_material_dict()
 # print(material_dict)
 
-def return_materials_position():
-
-    materials_position = {
-        'A': {
-            'box': [1,2,3,4,5,6],
-            'bottom': {
-                'black': [7,8],
-                'white': [9,10],
-                'pink': [11,12]
-            },
-            'middle': {
-                'black': [13,14],
-                'white': [15,16],
-                'pink': [17,18]                                    
-            },
-            'up': {
-                'black': [19,20],
-                'white': [21,22],
-                'pink': [23,24]                                    
-            },
-            'battery': [25],
-            'battery_lid': [26],                                 
-        },
-        'B': {
-            'box': [27,28,29,30,31,32],
-            'bottom': {
-                'black': [33,34],
-                'white': [35,36],
-                'pink': [37,38]
-            },
-            'middle': {
-                'black': [39,40],
-                'white': [41,42],
-                'pink': [43,44]                                    
-            },
-            'up': {
-                'black': [45,46],
-                'white': [47,48],
-                'pink': [49,50]                                    
-            },    
-            'battery': [51],
-            'battery_lid': [52],                             
-        }
-    }
-    return materials_position
-
-# 返回取第几个储位
-def return_locator_code(locatorList):
-    for j in locatorList:
-        index = int(j)
-        # print(index)
-        # print(gloVar.wssArray)
-        if gloVar.wssArray[index-1]:
-            return index
-
 # 获取预生产订单列表
 def get_order_list():
     uri = 'http://172.16.1.62/aim-mes/open-api/order/produce/v1/list'
@@ -87,6 +32,17 @@ def get_order_list():
     except Exception as e:
         print(e)
 
+
+# 返回取第几个储位
+def return_locator_code(locatorList):
+    for j in locatorList:
+        index = int(j)
+        # print(index)
+        # print(gloVar.wssArray)
+        if gloVar.wssArray[index-1]:
+            return index
+
+
 # 返回从托盘第几个位置开始抓取
 def get_plate_no(plate_dict):
     for key,value in plate_dict.items():
@@ -94,6 +50,7 @@ def get_plate_no(plate_dict):
         if value != 'null':
             return no
     return 1
+
 
 # 生成订单列表字符串
 def generate_seqliststr(order_list):
@@ -107,6 +64,7 @@ def generate_seqliststr(order_list):
     logger.info('=====seq_list_str===')
     logger.info(seq_list_str)
     return seq_list_str
+
 
 # 根据物料清单生成线边库号
 def get_line_storage_code(materialCode):
@@ -128,6 +86,7 @@ def get_line_storage_code(materialCode):
         print('error!')
 
     return line_storage_code
+
 
 # 激光打印签名
 def send_sign_to_laser(productCode, signType, signValue):
@@ -162,7 +121,7 @@ def send_sign_to_laser(productCode, signType, signValue):
             thread_laser = threading.Thread(name="thread_laser", target=client_send, args=(data,))
             thread_laser.start()  
         except Exception as e:
-            logger.info("jpeg to laser! error")
+            logger.info("jpeg to laser error!")
  
 
 # 生成物料位置列表
@@ -216,6 +175,7 @@ def generate_positions(order_list):
     except Exception as e:
         logger.info('generate_positions error')
         logger.info(e) 
+
 
 # 生成上料出库列表
 def generate_out_list(warehouse_bin_uri, positions):
@@ -274,11 +234,11 @@ def pre_load(order_list, siemens_1500, glock):
     productCode = gloVar.productNo
 
     if out_list:
-        thread_load = threading.Thread(name="thread_load", target=load_action, args=(siemens_1500, positionByte,noByte,quantityByte, enableByte, enableBit, enable, out_list,seq, productCode, glock))
+        thread_load = threading.Thread(name="thread_load", target=load_action, args=(siemens_1500, positionByte, noByte, quantityByte, enableByte, enableBit, enable, out_list, seq, productCode, glock))
         thread_load.start()
 
 
-def pre_unload(siemens_1500, index,glock):
+def pre_unload(siemens_1500, index, glock):
     positionByte = 2
     enableByte = 1
     enableBit = 0
@@ -286,8 +246,14 @@ def pre_unload(siemens_1500, index,glock):
     thread_unload = threading.Thread(name="thread_unload", target=unload_action, args=(siemens_1500,index, positionByte,  enableByte, enableBit, enable, glock))
     thread_unload.start()
 
+
+def pre_in():
+    pass
+
+
 def pre_out():
     pass
+
 
 def load_trigger(glock):
     siemens_1500 =  gloVar.siemens_1500
@@ -302,14 +268,16 @@ def load_trigger(glock):
             pre_load(order_list, siemens_1500, glock)
         time.sleep(10)
 
+
 def unload_trigger(glock):
     siemens_1500 =  gloVar.siemens_1500
 
     while True:
         if any(gloVar.line_get_ok_list):
             index = gloVar.line_get_ok_list.index(True) + 1
-            pre_unload(siemens_1500,index, glock)
+            pre_unload(siemens_1500, index, glock)
         time.sleep(0.5)
+
 
 def out_trigger(glock):
     siemens_1500 =  gloVar.siemens_1500
@@ -319,10 +287,10 @@ def out_trigger(glock):
             pre_out()
         time.sleep(1)
 
+
 def in_trigger(glock):
     siemens_1500 =  gloVar.siemens_1500
     while True:
         if False :
-            # 托盘全空
-            pre_out()
+            pre_in()
         time.sleep(1)
