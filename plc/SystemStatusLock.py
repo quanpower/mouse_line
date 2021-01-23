@@ -116,6 +116,7 @@ def query_system_status(glock):
                     # 不生产时，把状态设为完成
                     if work_done:
                         gloVar.state = 3
+                        
                     gloVar.pre_order_ok = pre_order_ok
 
                     logger.info('\n'*3)

@@ -226,12 +226,10 @@ def generate_out_list(warehouse_bin_uri, positions):
             if position:
                 r = requests.get(warehouse_bin_uri + str(position))
                 return_json = r.json()
-                # print(return_json)
-
                 warehouse_bin = return_json['data']
                 plate_dict = json.loads(warehouse_bin[0]['materialList'])
-                print('====plate_dict===')
-                print(plate_dict)
+                # print('====plate_dict===')
+                # print(plate_dict)
 
                 no = get_plate_no(plate_dict)
                 length = len(plate_dict.items())

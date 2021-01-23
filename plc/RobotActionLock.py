@@ -40,11 +40,10 @@ def get_material_code(position):
 def write_string_to_plc(s1500,string2plc,start):
     s = '00' + string2plc
     byarray=bytearray(s,encoding='utf-8')
-    print(byarray)
-
+    # print(byarray)
     for i, val in enumerate(byarray):
         index = start + i 
-        print ("序号：%s   值：%s" % (i + 1, val))
+        # print ("序号：%s   值：%s" % (i + 1, val))
         s1500.write_area(0x84,38,index, struct.pack('B', val))
 
 
@@ -55,18 +54,18 @@ def post_mes_warehouse():
         warehouse_snapshot_json = warehouse_snapshot.json()
         warehouse_snapshot_list = warehouse_snapshot_json['data']
 
-        logger.info('====warehouse_snapshot_list.json()====')
+        logger.info('====warehouse_snapshot_list====')
         logger.info(warehouse_snapshot_list)
         # post到MES
-        mes_warehouse_snapshot_post = requests.post(mes_warehouse_snapshot_url,data=warehouse_snapshot_list)
+        mes_warehouse_snapshot_post = requests.post(mes_warehouse_snapshot_url, data=warehouse_snapshot_list)
         #response = r.json()
         print ('=====mes_warehouse_snapshot_post.text====')
         print (mes_warehouse_snapshot_post.text())
         logger.info('=====mes_warehouse_snapshot_post.text====')
         logger.info(mes_warehouse_snapshot_post.text())
     except Exception as e:
-        logger.info ('post_mes_warehouse error') 
-        logger.info (e) 
+        logger.error ('post_mes_warehouse error') 
+        logger.error (e) 
 
 def post_mes_line_storage():
     try:
@@ -74,9 +73,9 @@ def post_mes_line_storage():
         line_storage_snapshot = requests.get(line_storage_snapshot_url)
         line_storage_snapshot_json = line_storage_snapshot.json()
         line_storage_snapshot_list = line_storage_snapshot_json['data']                
-        print('=====line_storage_snapshot_list.json()=====')
+        print('=====line_storage_snapshot_list=====')
         print(line_storage_snapshot_list)
-        logger.info('=====line_storage_snapshot_list.json()=====')
+        logger.info('=====line_storage_snapshot_list=====')
         logger.info(line_storage_snapshot_list)    
         # post MES
         mes_line_storage_snapshot_post = requests.post(mes_line_storage_snapshot_url, data=line_storage_snapshot_list)
@@ -86,8 +85,8 @@ def post_mes_line_storage():
         logger.info ('=====mes_line_storage_snapshot_post.text=====')                
         logger.info (mes_line_storage_snapshot_post.text()) 
     except Exception as e:
-        logger.info ('post_mes_line_storage error') 
-        logger.info (e) 
+        logger.error ('post_mes_line_storage error') 
+        logger.error (e) 
 
 def in_action(siemens_1500, positionByte, position, enableByte, enableBit, enable, goods, glock):
     logger.info('---in action----start-----')
@@ -160,8 +159,6 @@ def out_action(siemens_1500, positionByte,noByte,quantityByte, enableByte, enabl
             quantity = out['quantity']
 
             if gloVar.ready_ok:
-                print('=====output no=====')
-                print(position)
                 with glock:
                     siemens_1500.write_int_to_plc(38, positionByte, position)
                     time.sleep(0.1)
@@ -211,6 +208,8 @@ def load_action(siemens_1500, positionByte,noByte,quantityByte, enableByte, enab
 
         warehouse_url = warehouse_bin_url + str(position)
         line_storage_url = line_storage_bin_url + str(line_no)
+        logger.info(warehouse_url)
+        logger.info(line_storage_url)
 
         r = requests.get(warehouse_url)
         return_json = r.json()
@@ -228,11 +227,10 @@ def load_action(siemens_1500, positionByte,noByte,quantityByte, enableByte, enab
             logger.info('====gloVar.ready_ok====')
             logger.info(gloVar.ready_ok)
             if gloVar.ready_ok:
-                print('=====output no=====')
-                logger.info('=====output no=====')
+                # logger.info('=====output no=====')
 
-                logger.info(position)
-                print(position)
+                # logger.info(position)
+                # print(position)
                 
                 if can_write_flag:
                     with glock:
@@ -251,7 +249,6 @@ def load_action(siemens_1500, positionByte,noByte,quantityByte, enableByte, enab
                         print(enableByte)
                         print(enableBit)
                         print(enable)
-                    # time.sleep(10)
                 can_write_flag = False
                 # thread_write_load_action = threading.Thread(name='thread_write_load_action', target=write_load_action, args=(siemens_1500, positionByte,noByte,quantityByte, enableByte, enableBit, enable, out_list, seq, productCode, glock))
                 # thread_write_load_action.start()
@@ -277,13 +274,7 @@ def load_action(siemens_1500, positionByte,noByte,quantityByte, enableByte, enab
                 logger.info(response_put.json())                
                 
                 # post mes
-                try:
-                    post_mes_warehouse()
-                except Exception as e:
-                    print('post_mes_warehouse error')
-                    logger.info('post_mes_warehouse error')
-                    logger.info(e)
-
+                post_mes_warehouse()
             
             line_trigger = gloVar.line_put_ok_list[line_no-1]
             logger.info('==line_trigger====')
@@ -297,23 +288,21 @@ def load_action(siemens_1500, positionByte,noByte,quantityByte, enableByte, enab
                 }
                 payload = json.dumps(param)
 
+                logger.warning('====line_storage_update_error===')
+                logger.warning(payload)
+
                 try:
                     response_put = requests.put(line_storage_url, data=payload)
-                    print('=====response_put.json()====')
+                    print('=====response_put====')
                     print(response_put)
-                    logger.info('=====response_put.json()====')
+                    logger.info('=====response_put====')
                     logger.info(response_put)                
                 except Exception as e:
-                    logger.info('=====line_storage_update_error====')
-                    logger.info(e)
+                    logger.error('=====line_storage_update_error====')
+                    logger.error(e)
                 
                 # post mes
-                try:
-                    post_mes_line_storage() 
-                except Exception as e:
-                    print('post_mes_line_storage error')
-                    logger.info('post_mes_line_storage error')
-                    logger.info(e)
+                post_mes_line_storage() 
 
                 break
 
