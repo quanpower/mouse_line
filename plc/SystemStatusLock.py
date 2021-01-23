@@ -58,8 +58,9 @@ def query_system_status(glock):
                     line_get_ok_list = [z2_get_ok, z3_get_ok, z4_get_ok, z5_get_ok, z6_get_ok, z7_get_ok]
                     line_put_ok_list = [z2_put_ok, z3_put_ok, z4_put_ok, z5_put_ok, z6_put_ok, z7_put_ok]
 
-                    producing = rpgds_array_2[2]
-                    
+                    work_done = rpgds_array_2[2]
+                    pre_order_ok = rpgds_array_2[3]
+
                     # 相机触发
                     camera_trigger = siemens_1500.query_block_from_plc(38,0,1)
                     ct =struct.unpack('>B', camera_trigger)
@@ -111,10 +112,11 @@ def query_system_status(glock):
 
                     gloVar.ready_ok = ready_ok
 
-                    gloVar.producing = producing
+                    gloVar.work_done = work_done
                     # 不生产时，把状态设为完成
-                    if producing:
+                    if work_done:
                         gloVar.state = 3
+                    gloVar.pre_order_ok = pre_order_ok
 
                     logger.info('\n'*3)
                     logger.info('=====warehouse_senser_status======')
@@ -130,11 +132,13 @@ def query_system_status(glock):
                     logger.info(line_put_ok_list)
                     logger.info('======plate_check_list=====')
                     logger.info(plate_check_list)
-                    logger.info('====producing======')
-                    logger.info(producing)
+                    logger.info('====work_done======')
+                    logger.info(work_done)
                     logger.info('====ready_ok======')
                     logger.info(ready_ok)
-                    
+                    logger.info('====pre_order_ok======')
+                    logger.info(pre_order_ok) 
+
                 except Exception as e:
                     print(e)
                     logger.error(e)

@@ -20,7 +20,8 @@ class gloVar():
     line_get_ok_list = []
     line_put_ok_list = []
     plate_check_list = []
-    producing = False
+    work_done = False
+    pre_order_ok = False
     
     ua_order_list = []
     

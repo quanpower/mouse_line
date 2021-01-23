@@ -1,17 +1,19 @@
+import os
 import requests
 import json
 import time
 import datetime
-from global_list import gloVar
+
 import operator
 import threading 
 from RobotActionLock import in_action, out_action, load_action, unload_action
 from utils import get_material_dict
 import logging
+from laser_client import client_send
 
 logger = logging.getLogger(__name__)
 
-
+from global_list import gloVar
 
 material_dict = get_material_dict()
 # print(material_dict)
@@ -127,6 +129,42 @@ def get_line_storage_code(materialCode):
 
     return line_storage_code
 
+# 激光打印签名
+def send_sign_to_laser(productCode, signType, signValue):
+    if signType == 0:
+        print('none to laser!')
+    elif signType == 1:
+        print('text to laser!')
+        '''A:GDM1=ABC123*GDM2=123ABC*JPG=D:\PLT\tongjian.jpg'''
+        data = productCode[:1]+':GDM1=' + signValue
+        print(data)
+        logger.info('====text to laser!===')
+        logger.info(data)
+        thread_laser = threading.Thread(name="thread_laser", target=client_send, args=(data,))
+        thread_laser.start()         
+    elif signType == 2:
+        print('jpeg to laser!')
+        file_name = os.path.basename(signValue)
+        file_path = "D:\\PLT\\" + file_name
+        print(signValue)
+        print(file_path)
+        try:
+            response = requests.get(signValue)
+            # 获取的文本实际上是图片的二进制文本
+            img = response.content
+            # 将他拷贝到本地文件 w 写  b 二进制  wb代表写入二进制文本
+            with open( file_path,'wb' ) as f:
+                f.write(img)
+
+            data = productCode[:1]+ ":JPG=" + file_path
+            logger.info('====jpeg to laser!===')
+            logger.info(data)        
+            thread_laser = threading.Thread(name="thread_laser", target=client_send, args=(data,))
+            thread_laser.start()  
+        except Exception as e:
+            logger.info("jpeg to laser! error")
+ 
+
 # 生成物料位置列表
 def generate_positions(order_list):
     global material_dict
@@ -139,6 +177,9 @@ def generate_positions(order_list):
         signType = pre_produce['signType']
         signValue = pre_produce['signValue']
         
+        send_sign_to_laser(productCode, signType, signValue)
+
+
         # 更新全局生产订单状态
         gloVar.orderNo = seq
         gloVar.productNo = productCode
@@ -220,6 +261,7 @@ def pre_load(order_list, siemens_1500, glock):
     warehouse_bin_uri = 'http://localhost:8088/v1/api/wms/warehouse/bin/'    
     seq_list_str = generate_seqliststr(order_list)
     print(seq_list_str)
+
     positions = generate_positions(order_list)
     out_list = generate_out_list(warehouse_bin_uri, positions)
 
@@ -229,6 +271,9 @@ def pre_load(order_list, siemens_1500, glock):
     enableByte = 4
     enableBit = 0
     enable = 1
+
+    seq = gloVar.orderNo
+    productCode = gloVar.productNo
 
     if out_list:
         thread_load = threading.Thread(name="thread_load", target=load_action, args=(siemens_1500, positionByte,noByte,quantityByte, enableByte, enableBit, enable, out_list,seq, productCode, glock))
@@ -253,7 +298,7 @@ def load_trigger(glock):
 
     while True:
         order_list = get_order_list()
-        if gloVar.producing:
+        if gloVar.pre_order_ok:
             print('===load_trigger===')
             logger.info('===load_trigger===')
             pre_load(order_list, siemens_1500, glock)
