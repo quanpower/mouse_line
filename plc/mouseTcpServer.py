@@ -11,7 +11,7 @@ from SystemStatusLock import query_system_status
 from RobotActionLock import in_action, out_action
 from camera import trigger_assembly_line_camara, trigger_warehouse_camara, shift_action, camera_trigger
 from produce import load_trigger, unload_trigger, in_trigger ,out_trigger
-from uaServer import ua_main
+from uaServer1 import ua_main
 from laser_client import client_send
 import threading 
 import traceback

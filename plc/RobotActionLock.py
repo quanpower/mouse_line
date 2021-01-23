@@ -206,9 +206,8 @@ def load_action(siemens_1500, positionByte,noByte,quantityByte, enableByte, enab
 
         print('======source_material_list=====')
         print(source_material_list)
-
         while 1: 
-            print(datetime.datetime.now())
+            # print(datetime.datetime.now())
             # 发给PLC机器人移动指令
             if gloVar.ready_ok:
                 print('=====output no=====')
@@ -237,7 +236,9 @@ def load_action(siemens_1500, positionByte,noByte,quantityByte, enableByte, enab
                     siemens_1500.write_bool_to_plc(38, enableByte, enableBit, 0)
                 logger.info(position)
 
-            print(gloVar.warehouse_get_ok)
+            logger.info('====gloVar.warehouse_get_ok====')
+            logger.info(gloVar.warehouse_get_ok)
+
             if gloVar.warehouse_get_ok:
                 # 取件完成，更新立库
                 material_list = generate_null_material_list_json(position)
@@ -254,7 +255,9 @@ def load_action(siemens_1500, positionByte,noByte,quantityByte, enableByte, enab
             
 
             line_trigger = gloVar.line_put_ok_list[line_no-1]
-            print(line_trigger)
+            logger.info('==line_trigger====')
+            logger.info(line_trigger)
+
             if line_trigger:
                 # 放件完成，更新线边库,
                 param = {'isEmpty': 0,
@@ -272,6 +275,7 @@ def load_action(siemens_1500, positionByte,noByte,quantityByte, enableByte, enab
                 break
 
             i += 1
+            logger.info('load_action i')
             logger.info(i)
             # 跳出while,结束上料
             if i >= 3000:
@@ -340,6 +344,7 @@ def unload_action(siemens_1500, index, positionByte, enableByte, enableBit, enab
             break
         
         i += 1
+        logger.info('unload_action i')
         logger.info(i)
         # 跳出while,结束入库
         if i >= 600:

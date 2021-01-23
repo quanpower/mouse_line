@@ -104,10 +104,10 @@ def ua_main():
 
             logger.info('Set value of %s to %.1f', order_1_duration, duration)
 
-            await order_1_orderNo.write_value(gloVar.orderNo)
-            await order_1_productNo.write_value(gloVar.productNo)
-            await order_1_state.write_value(gloVar.state)
-            await order_1_duration.write_value(duration)
+            order_1_orderNo.set_value(gloVar.orderNo)
+            order_1_productNo.set_value(gloVar.productNo)
+            order_1_state.set_value(gloVar.state)
+            order_1_duration.set_value(duration)
     finally:
         #close connection, remove subcsriptions, etc
         server.stop()
