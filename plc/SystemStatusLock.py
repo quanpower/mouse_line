@@ -144,7 +144,7 @@ def query_system_status(glock):
                     logger.info(line_put_ok_list)
                     logger.info(plate_check_list)
                     logger.info(producing)
-                    print(producing)
+                    # print(producing)
                     
                 except Exception as e:
                     print(e)
