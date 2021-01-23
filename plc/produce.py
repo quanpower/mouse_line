@@ -72,11 +72,13 @@ def get_order_list():
     uri = 'http://172.16.1.62/aim-mes/open-api/order/produce/v1/list'
     r = requests.get(uri)
     return_json = r.json()
-    order_list = return_json['data']
-
-    sorted_order_list = sorted(order_list, key=operator.itemgetter('seq'))
-    # print(sorted_order_list)
-    return sorted_order_list
+    try:
+        order_list = return_json['data']
+        sorted_order_list = sorted(order_list, key=operator.itemgetter('seq'))
+        # print(sorted_order_list)
+        return sorted_order_list
+    except expression as e:
+        print(e)
 
 def get_plate_no(plate_dict):
     for key,value in plate_dict.items():
