@@ -96,24 +96,9 @@ def query_system_status(glock):
                     r4_plate_2 = rs[12]
                     r7_plate = rs[13]
 
-                    logger.info('\n'*3)
-                    logger.info('=====warehouse_senser_status======')
-                    logger.info(wss)
-                    logger.info(rs)
-                    logger.info(wssArray)
-
-                    # print('=====warehouse_senser_status======')
-                    # print(bitArrayA)
-                    # print(bitArrayB)
-                    # print(wssArray)
-
-                    if wss:
-                        gloVar.warehouse_senser_status = wss
-                    if camera_triggers:
-                        gloVar.camera_triggers = camera_triggers
-                        gloVar.ready_ok = ready_ok
-                    if rs:
-                        gloVar.robot_status = rs
+                    gloVar.warehouse_senser_status = wss
+                    gloVar.camera_triggers = camera_triggers
+                    gloVar.robot_status = rs
 
                     gloVar.wssArray = wssArray
 
@@ -124,27 +109,31 @@ def query_system_status(glock):
                     gloVar.line_put_ok_list = line_put_ok_list
                     gloVar.plate_check_list = plate_check_list
 
-                    # gloVar.z3_get_ok = z3_get_ok
-                    # gloVar.z3_put_ok = z3_put_ok
-                    # gloVar.z4_get_ok = z4_get_ok
-                    # gloVar.z4_put_ok = z4_put_ok          
-                    # gloVar.z5_get_ok = z5_get_ok
-                    # gloVar.z5_put_ok = z5_put_ok
-                    # gloVar.z6_get_ok = z6_get_ok
-                    # gloVar.z6_put_ok = z6_put_ok  
-
-                    # gloVar.z7_get_ok = z7_get_ok
-                    # gloVar.z7_put_ok = z7_put_ok  
+                    gloVar.ready_ok = ready_ok
 
                     gloVar.producing = producing
+                    # 不生产时，把状态设为完成
+                    if producing:
+                        gloVar.state = 3
 
-                    logger.info(warehouse_get_ok)
+                    logger.info('\n'*3)
+                    logger.info('=====warehouse_senser_status======')
+                    logger.info('====wssArray===')
+                    logger.info(wssArray)
+                    logger.info('===warehouse_put_ok===')
                     logger.info(warehouse_put_ok)
+                    logger.info('====warehouse_get_ok====')
+                    logger.info(warehouse_get_ok)
+                    logger.info('===line_get_ok_list====')
                     logger.info(line_get_ok_list)
+                    logger.info('====line_put_ok_list=====')
                     logger.info(line_put_ok_list)
+                    logger.info('======plate_check_list=====')
                     logger.info(plate_check_list)
+                    logger.info('====producing======')
                     logger.info(producing)
-                    # print(producing)
+                    logger.info('====ready_ok======')
+                    logger.info(ready_ok)
                     
                 except Exception as e:
                     print(e)

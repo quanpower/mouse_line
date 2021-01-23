@@ -1,125 +1,109 @@
 import logging
-import asyncio
-import sys
 import datetime
 import time
 from global_list import gloVar
-
+import sys
 sys.path.insert(0, "..")
-
-from asyncua import ua, Server
-from asyncua.common.methods import uamethod
 
 logger = logging.getLogger(__name__)
 
-# logging.basicConfig(level=logging.INFO)
-# _logger = logging.getLogger('asyncua')
+from opcua import ua, Server
 
-
-@uamethod
-def func(parent, value):
-    return value * 2
-
-
-async def ua_main():
+def ua_main():
     # setup our server
     server = Server()
-    await server.init()
+    server.set_endpoint("opc.tcp://172.16.6.250:5616/")
 
-    server.set_endpoint('opc.tcp://172.16.6.250:5616/')
-    # server.set_endpoint('opc.tcp://192.168.1.8:5616/')
-    server.set_server_name("AGV OpcUa Server")
-    # # setup our own namespace, not really necessary but should as spec
-    uri = 'http://examples.freeopcua.github.io'
-    idx = await server.register_namespace(uri)
+    # setup our own namespace, not really necessary but should as spec
+    uri = "http://examples.freeopcua.github.io"
+    idx = server.register_namespace(uri)
 
-    # populating our address space
-    # server.nodes, contains links to very common nodes like objects and root
+    # get Objects node, this is where we should put our nodes
+    objects = server.get_objects_node()
 
-    order_folder = await server.nodes.objects.add_folder(idx, "orderFolder")
+    # # populating our address space
+    # myobj = objects.add_object(idx, "MyObject")
+    # myvar = myobj.add_variable(idx, "MyVariable", 6.7)
+    # myvar.set_writable()    # Set MyVariable to be writable by clients
 
-    order_1 = await order_folder.add_object(idx, 'order_1')
-    order_1_orderNo = await order_1.add_variable(idx, 'orderNo', 'PP000151')
-    order_1_productNo = await order_1.add_variable(idx, 'productNo', 'A01')
-    order_1_state = await order_1.add_variable(idx, 'state', 0)
-    order_1_duration = await order_1.add_variable(idx, 'duration', 0)
+    order_folder =  server.nodes.objects.add_folder(idx, "orderFolder")
 
-    order_2 = await order_folder.add_object(idx, 'order_2')
-    order_2_orderNo = await order_2.add_variable(idx, 'orderNo', 'PP000000')
-    order_2_productNo = await order_2.add_variable(idx, 'productNo', 'A01')
-    order_2_state = await order_2.add_variable(idx, 'state', 0)
-    order_2_duration = await order_2.add_variable(idx, 'duration', 0)
+    order_1 =  order_folder.add_object(idx, 'order_1')
+    order_1_orderNo =  order_1.add_variable(idx, 'orderNo', 'PP000151')
+    order_1_productNo =  order_1.add_variable(idx, 'productNo', 'A01')
+    order_1_state =  order_1.add_variable(idx, 'state', 0)
+    order_1_duration =  order_1.add_variable(idx, 'duration', 0)
 
-    order_3 = await order_folder.add_object(idx, 'order_3')
-    order_3_orderNo = await order_3.add_variable(idx, 'orderNo', 'PP000000')
-    order_3_productNo = await order_3.add_variable(idx, 'productNo', 'A01')
-    order_3_state = await order_3.add_variable(idx, 'state', 0)
-    order_3_duration = await order_3.add_variable(idx, 'duration', 0)
+    order_2 =  order_folder.add_object(idx, 'order_2')
+    order_2_orderNo =  order_2.add_variable(idx, 'orderNo', 'PP000000')
+    order_2_productNo =  order_2.add_variable(idx, 'productNo', 'A01')
+    order_2_state =  order_2.add_variable(idx, 'state', 0)
+    order_2_duration =  order_2.add_variable(idx, 'duration', 0)
 
-    order_4 = await order_folder.add_object(idx, 'order_4')
-    order_4_orderNo = await order_4.add_variable(idx, 'orderNo', 'PP000000')
-    order_4_productNo = await order_4.add_variable(idx, 'productNo', 'A01')
-    order_4_state = await order_4.add_variable(idx, 'state', 0)
-    order_4_duration = await order_4.add_variable(idx, 'duration', 0)
+    order_3 =  order_folder.add_object(idx, 'order_3')
+    order_3_orderNo =  order_3.add_variable(idx, 'orderNo', 'PP000000')
+    order_3_productNo =  order_3.add_variable(idx, 'productNo', 'A01')
+    order_3_state =  order_3.add_variable(idx, 'state', 0)
+    order_3_duration =  order_3.add_variable(idx, 'duration', 0)
 
-    order_5 = await order_folder.add_object(idx, 'order_5')
-    order_5_orderNo = await order_5.add_variable(idx, 'orderNo', 'PP000000')
-    order_5_productNo = await order_5.add_variable(idx, 'productNo', 'A01')
-    order_5_state = await order_5.add_variable(idx, 'state', 0)
-    order_5_duration = await order_5.add_variable(idx, 'duration', 0)
+    order_4 =  order_folder.add_object(idx, 'order_4')
+    order_4_orderNo =  order_4.add_variable(idx, 'orderNo', 'PP000000')
+    order_4_productNo =  order_4.add_variable(idx, 'productNo', 'A01')
+    order_4_state =  order_4.add_variable(idx, 'state', 0)
+    order_4_duration =  order_4.add_variable(idx, 'duration', 0)
 
-    order_6 = await order_folder.add_object(idx, 'order_6')
-    order_6_orderNo = await order_6.add_variable(idx, 'orderNo', 'PP000000')
-    order_6_productNo = await order_6.add_variable(idx, 'productNo', 'A01')
-    order_6_state = await order_6.add_variable(idx, 'state', 0)
-    order_6_duration = await order_6.add_variable(idx, 'duration', 0)
+    order_5 =  order_folder.add_object(idx, 'order_5')
+    order_5_orderNo =  order_5.add_variable(idx, 'orderNo', 'PP000000')
+    order_5_productNo =  order_5.add_variable(idx, 'productNo', 'A01')
+    order_5_state =  order_5.add_variable(idx, 'state', 0)
+    order_5_duration =  order_5.add_variable(idx, 'duration', 0)
 
-    order_7 = await order_folder.add_object(idx, 'order_7')
-    order_7_orderNo = await order_7.add_variable(idx, 'orderNo', 'PP000000')
-    order_7_productNo = await order_7.add_variable(idx, 'productNo', 'A01')
-    order_7_state = await order_7.add_variable(idx, 'state', 0)
-    order_7_duration = await order_7.add_variable(idx, 'duration', 0)
+    order_6 =  order_folder.add_object(idx, 'order_6')
+    order_6_orderNo =  order_6.add_variable(idx, 'orderNo', 'PP000000')
+    order_6_productNo =  order_6.add_variable(idx, 'productNo', 'A01')
+    order_6_state =  order_6.add_variable(idx, 'state', 0)
+    order_6_duration =  order_6.add_variable(idx, 'duration', 0)
 
-    agv_order = await order_folder.add_object(idx, 'agv_order')
-    agv_orderNo = await agv_order.add_variable(idx, 'agv_order_list', 'PP000151,PP000152,PP000153')
+    order_7 =  order_folder.add_object(idx, 'order_7')
+    order_7_orderNo =  order_7.add_variable(idx, 'orderNo', 'PP000000')
+    order_7_productNo =  order_7.add_variable(idx, 'productNo', 'A01')
+    order_7_state =  order_7.add_variable(idx, 'state', 0)
+    order_7_duration =  order_7.add_variable(idx, 'duration', 0)
 
-    agv_folder = await server.nodes.objects.add_folder(idx, "agvFolder")
+    agv_order =  order_folder.add_object(idx, 'agv_order')
+    agv_orderNo =  agv_order.add_variable(idx, 'agv_order_list', 'PP000151,PP000152,PP000153')
 
-    agv = await agv_folder.add_object(idx, 'agv')
+    agv_folder =  server.nodes.objects.add_folder(idx, "agvFolder")
 
-    position = await agv.add_variable(idx, 'position', '5')
-    speed = await agv.add_variable(idx, 'speed', 9.99)
-    running = await agv.add_variable(idx, 'running', 1)
+    agv =  agv_folder.add_object(idx, 'agv')
 
+    position =  agv.add_variable(idx, 'position', '5')
+    speed =  agv.add_variable(idx, 'speed', 9.99)
+    running =  agv.add_variable(idx, 'running', 1)
 
     # Set MyVariable to be writable by clients
-    await position.set_writable()
-    await speed.set_writable()
-    await running.set_writable()
 
-    # await server.nodes.objects.add_method(ua.NodeId('ServerMethod', 2), ua.QualifiedName('ServerMethod', 2), func, [ua.VariantType.Int64], [ua.VariantType.Int64])
-    
-    # _logger.info('Starting server!')
-    async with server:
+    position.set_writable()
+    speed.set_writable()
+    running.set_writable()
+
+
+    # starting!
+    server.start()
+
+    try:
         while True:
-            await asyncio.sleep(0.5)
-            # new_val = await order_1_duration.get_value() + 0.1
+            time.sleep(0.5)
 
             duration = time.time() - gloVar.startTime
+            # logger.info('Set value of %s to %.1f', order_1_duration, duration)
+            order_1_orderNo.set_value(gloVar.orderNo)
+            order_1_productNo.set_value(gloVar.productNo)
+            order_1_state.set_value(gloVar.state)
+            order_1_duration.set_value(duration)
+    finally:
+        #close connection, remove subcsriptions, etc
+        server.stop()
 
-            logger.info('Set value of %s to %.1f', order_1_duration, duration)
-
-            await order_1_orderNo.write_value(gloVar.orderNo)
-            await order_1_productNo.write_value(gloVar.productNo)
-            await order_1_state.write_value(gloVar.state)
-            await order_1_duration.write_value(duration)
-            # await order_2_duration.write_value(new_val)
-            # await order_3_duration.write_value(new_val)
-            # await order_4_duration.write_value(new_val)
-            # await order_5_duration.write_value(new_val)
-            # await order_6_duration.write_value(new_val)
-            # await order_7_duration.write_value(new_val)
-
-
-if __name__ == '__main__':
-    asyncio.run(ua_main())
+if __name__ == "__main__":        
+    ua_main()
