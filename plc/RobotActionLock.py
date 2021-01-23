@@ -196,7 +196,6 @@ def load_action(siemens_1500, positionByte,noByte,quantityByte, enableByte, enab
 
         line_no = generate_linestorage_no(position)
 
-
         warehouse_url = warehouse_bin_url + str(position)
         line_storage_url = line_storage_bin_url + str(line_no)
 
@@ -229,7 +228,7 @@ def load_action(siemens_1500, positionByte,noByte,quantityByte, enableByte, enab
                     print(enableBit)
                     print(enable)
 
-                time.sleep(3)
+                # time.sleep(3)
 
                 # 出库使能复位
                 with glock:
