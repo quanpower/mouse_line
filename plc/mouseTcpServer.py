@@ -339,7 +339,7 @@ if __name__ == "__main__":
 
 
         # 循环读取生产订单，上报opc ua server
-        thread_ua_main = threading.Thread(name='thread_ua_main', target=ua_main, args=(glock,))
+        thread_ua_main = threading.Thread(name='thread_ua_main', target=ua_main)
         thread_ua_main.start()        
 
         HOST, PORT = "172.16.6.250", 8000 #windows
