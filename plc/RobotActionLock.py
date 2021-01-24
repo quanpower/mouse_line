@@ -333,7 +333,7 @@ def load_action(siemens_1500, positionByte,noByte,quantityByte, enableByte, enab
                 # 2.取件完成，更新立库储位为空
                 update_warehouse_null(warehouse_url, position)              
                 # 3.创建新的立库outandin版本库 
-                create_new_warehouse_version('out', '0'+str(position), source_material_list)
+                create_new_warehouse_version('Out', '0'+str(position), source_material_list)
                 # 4.POST提交到MES接口
                 post_mes_warehouse()
 
@@ -346,7 +346,7 @@ def load_action(siemens_1500, positionByte,noByte,quantityByte, enableByte, enab
                 # 1.更新线边库储位
                 update_line_storage_bin(line_storage_url, position, source_material_list)
                 # 2.创建新的线边库outandin版本库
-                create_new_line_storage_version('in', 'LineStorage'+str(line_no), source_material_list)
+                create_new_line_storage_version('In', 'LineStorage'+str(line_no), source_material_list)
                 # 3.POST提交到MES接口
                 post_mes_line_storage() 
                 # 4.退出该物料上料循环

@@ -12,7 +12,8 @@ import requests
 
 from utils import generate_materials_list, generate_plate_info_json, generate_warehouse_info, \
     generate_warehouse_info_init, generate_line_storage_info, \
-    generate_line_storage_info_init, generate_material_storage_init, get_material_dict, generate_material_list_json
+    generate_line_storage_info_init, generate_material_storage_init, get_material_dict, generate_material_list_json, \
+        generate_warehouse_version_init, generate_linestorage_version_init
 
 app = FastAPI()
 
@@ -143,53 +144,43 @@ async def startup():
 async def shutdown():
     await database.disconnect()
 
+@app.post("/v1/api/wms/database/init")
+async def database_init():
+    # 初始化物料清单列表
+    materials_query = materials.insert().values(generate_materials_list())
+    materials_query_id = await database.execute(materials_query)
 
-# 初始化物料清单列表
-@app.post("/v1/api/wms/materials/init")
-async def materials_init():
-    query = materials.insert().values(generate_materials_list())
-    last_record_id = await database.execute(query)
+    # 初始化立库列表
+    warehouse_query = warehouse.insert().values(generate_warehouse_info_init())
+    warehouse_id = await database.execute(warehouse_query)
 
-    return {
-        "code" : 0,
-        "message" : "数据处理成功！",
-        "data" : {"id": last_record_id}
-    }
+    # 初始化线边库列表
+    linestorage_query = linestorage.insert().values(generate_line_storage_info_init())
+    linestorage_id = await database.execute(linestorage_query)
+    
+    # 初始化物料-储位对应关系表
+    material_storage_query = material_storage.insert().values(generate_material_storage_init())
+    material_storage_id = await database.execute(material_storage_query)
 
-# 初始化立库列表
-@app.post("/v1/api/wms/warehouse/init")
-async def warehouse_init():
-    query = warehouse.insert().values(generate_warehouse_info_init())
-    last_record_id = await database.execute(query)
+    # 初始化立库outandin版本库
+    warehouse_outandin_query = warehouse_version.insert().values(generate_warehouse_version_init())
+    warehouse_outandin_id = await database.execute(warehouse_outandin_query)
 
-    return {
-        "code" : 0,
-        "message" : "数据处理成功！",
-        "data" : {"id": last_record_id}
-    }
-
-# 初始化线边库列表
-@app.post("/v1/api/wms/line_storage/init")
-async def line_storage_init():
-    query = linestorage.insert().values(generate_line_storage_info_init())
-    last_record_id = await database.execute(query)
+    # 初始化线边库outandin版本库
+    linestorage_outandin_query = linestorage_version.insert().values(generate_linestorage_version_init())
+    linestorage_outandin_id = await database.execute(linestorage_outandin_query)
 
     return {
         "code" : 0,
         "message" : "数据处理成功！",
-        "data" : {"id": last_record_id}
-    }
-
-# 初始化物料-储位对应关系表
-@app.post("/v1/api/wms/material_storage/init")
-async def material_storage_init():
-    query = material_storage.insert().values(generate_material_storage_init())
-    last_record_id = await database.execute(query)
-
-    return {
-        "code" : 0,
-        "message" : "数据处理成功！",
-        "data" : {"id": last_record_id}
+        "data" : {
+            "materials_query_id": materials_query_id,
+            "warehouse_id": warehouse_id,
+            "linestorage_id": linestorage_id,
+            "material_storage_id": material_storage_id,
+            "warehouse_outandin_id": warehouse_outandin_id,
+            "linestorage_outandin_id": linestorage_outandin_id
+        }
     }
 
 

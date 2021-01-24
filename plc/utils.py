@@ -1,5 +1,6 @@
 import requests
 import json
+import datetime
 
 def generate_materials_list():
     materialsList = [
@@ -559,6 +560,27 @@ def generate_null_material_list_json(bin_id):
     print(materialList)
 
     return materialList
+
+
+def generate_warehouse_version_init():
+
+    param = {'action': 'In',
+        'positionCode': '007',
+        'materialList': generate_plate_info_json(1,10, 'null') ,
+        'created_date': datetime.datetime.now()
+    }                
+
+    warehouse_version = [param,]
+    return warehouse_version
+
+def generate_linestorage_version_init():
+    param = {'action': 'Out',
+        'positionCode': 'LineStorage1',
+        'materialList': generate_plate_info_json(1,10, 'null') ,
+        'created_date': datetime.datetime.now()
+    }          
+    linestorage_version = [param,]
+    return linestorage_version
 
 def bcd_to_int(x):
     """
