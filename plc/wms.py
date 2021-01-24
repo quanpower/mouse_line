@@ -4,7 +4,7 @@ import databases
 import sqlalchemy
 from fastapi import FastAPI
 from pydantic import BaseModel
-import datetime
+from datetime import datetime
 import uvicorn
 import json
 from typing import Optional
@@ -76,14 +76,20 @@ warehouse_version = sqlalchemy.Table(
     "warehouse_version",
     metadata,
     sqlalchemy.Column("id", sqlalchemy.Integer, autoincrement=True,primary_key=True),
-    sqlalchemy.Column("created_date", sqlalchemy.DateTime, default=datetime.datetime.utcnow()),
+    sqlalchemy.Column("action", sqlalchemy.String(5)),
+    sqlalchemy.Column("positionCode", sqlalchemy.String(20)),
+    sqlalchemy.Column("materialList", sqlalchemy.Text),
+    sqlalchemy.Column("created_date", sqlalchemy.DateTime, default=datetime.utcnow()),
 )
 
 linestorage_version = sqlalchemy.Table(
     "linestorage_version",
     metadata,
     sqlalchemy.Column("id", sqlalchemy.Integer, autoincrement=True,primary_key=True),
-    sqlalchemy.Column("created_date", sqlalchemy.DateTime, default=datetime.datetime.utcnow()),
+    sqlalchemy.Column("action", sqlalchemy.String(5)),
+    sqlalchemy.Column("positionCode", sqlalchemy.String(20)),
+    sqlalchemy.Column("materialList", sqlalchemy.Text),
+    sqlalchemy.Column("created_date", sqlalchemy.DateTime, default=datetime.utcnow()),
 )
 
 engine = sqlalchemy.create_engine(
@@ -105,6 +111,13 @@ class OrderDetail(BaseModel):
 class Order(BaseModel):
     orders: list = []
 
+
+class OutAndIn(BaseModel):
+    action: str
+    positionCode: str
+    materialList: str
+    # created_date: datetime = None
+
 class WHPlate(BaseModel):
     isEmpty: bool
     materialList: str
@@ -125,11 +138,13 @@ def get_material_code(material_dict, position):
 async def startup():
     await database.connect()
 
+
 @app.on_event("shutdown")
 async def shutdown():
     await database.disconnect()
 
-# 初始化数据库列表
+
+# 初始化物料清单列表
 @app.post("/v1/api/wms/materials/init")
 async def materials_init():
     query = materials.insert().values(generate_materials_list())
@@ -141,6 +156,7 @@ async def materials_init():
         "data" : {"id": last_record_id}
     }
 
+# 初始化立库列表
 @app.post("/v1/api/wms/warehouse/init")
 async def warehouse_init():
     query = warehouse.insert().values(generate_warehouse_info_init())
@@ -152,6 +168,7 @@ async def warehouse_init():
         "data" : {"id": last_record_id}
     }
 
+# 初始化线边库列表
 @app.post("/v1/api/wms/line_storage/init")
 async def line_storage_init():
     query = linestorage.insert().values(generate_line_storage_info_init())
@@ -163,6 +180,7 @@ async def line_storage_init():
         "data" : {"id": last_record_id}
     }
 
+# 初始化物料-储位对应关系表
 @app.post("/v1/api/wms/material_storage/init")
 async def material_storage_init():
     query = material_storage.insert().values(generate_material_storage_init())
@@ -173,6 +191,7 @@ async def material_storage_init():
         "message" : "数据处理成功！",
         "data" : {"id": last_record_id}
     }
+
 
 # 物料对应储位列表
 @app.get("/v1/api/wms/material_storage")
@@ -191,7 +210,7 @@ async def get_material_storage():
 @app.get("/v1/api/wms/warehouse/snapshot/list")
 async def get_warehouse_snapshot(ver: Optional[int] = None):
     ver_query = warehouse_version.select().order_by(warehouse_version.c.id.desc())
-    version = await database.fetch_one(ver_query)
+    outandin_ver = await database.fetch_one(ver_query)
 
     query = warehouse.select()
     result = await database.fetch_all(query)
@@ -205,17 +224,21 @@ async def get_warehouse_snapshot(ver: Optional[int] = None):
             plate['materialCode'] = value
             materialList.append(plate)
         snapshot.append({"locatorCode": i.locatorCode, "materialList": materialList})
+    
+    # 获取最新版本outandin
+    outandin_materialList_dict = json.loads(outandin_ver.materialList)
+    outandin_materialList = []
+    for key,value in outandin_materialList_dict.items():
+        plate = {}
+        plate['materialPlace'] = key
+        plate['materialCode'] = value
+        outandin_materialList.append(plate)
 
     outandin = [
                 {
-                    "action":"out",
-                    "locatorCode":"021",
-                    "materialList":[
-                        {
-                            "materialCode":"Ba01.01",
-                            "materialPlace":"3"
-                        },
-                    ],
+                    "action": outandin_ver.action,
+                    "locatorCode": outandin_ver.positionCode,
+                    "materialList": outandin_materialList
                 }
             ]
 
@@ -223,29 +246,13 @@ async def get_warehouse_snapshot(ver: Optional[int] = None):
         "code" : 0,
         "message" : "数据处理成功！",
         "data" : {
-            "ver":version.id,
+            "ver":outandin_ver.id,
             "snapshot":snapshot,
             "outandin":outandin
         }
     }
     return return_json
 
-"""
-
-            "outandin":[
-                {
-                    "action":"out",
-                    "locatorCode":"021",
-                    "materialList":[
-                        {
-                            "materialCode":"Ba01.01",
-                            "materialPlace":"3"
-                        },
-                    ],
-                }
-            ]
-
-"""
 
 @app.get("/v1/api/wms/warehouse/bin/{bin_id}")
 async def get_warehouse_bin(bin_id: int, q: Optional[str] = None):
@@ -258,6 +265,7 @@ async def get_warehouse_bin(bin_id: int, q: Optional[str] = None):
         "data" : result
     }
     return return_json
+
 
 @app.put("/v1/api/wms/warehouse/bin/{bin_id}")
 async def update_warehouse_bin(bin_id: int, plate: WHPlate, q: Optional[str] = None):
@@ -276,9 +284,11 @@ async def update_warehouse_bin(bin_id: int, plate: WHPlate, q: Optional[str] = N
     return return_json
 
 
+# 创建新的warehouse version记录
 @app.post("/v1/api/wms/warehouse/version")
-async def create_warehouse_version():
-    query = warehouse_version.insert().values(created_date=datetime.datetime.now())
+async def create_warehouse_version(outandin: OutAndIn):
+
+    query = warehouse_version.insert().values(action=outandin.action, positionCode=outandin.positionCode, materialList=outandin.materialList, created_date=datetime.now())
     last_record_id = await database.execute(query)
 
     return {
@@ -287,7 +297,9 @@ async def create_warehouse_version():
         "data" : {"id": last_record_id}
     }
 
-@app.get("/v1/api/wms/warehouse/version")
+
+# 获取warehouse_version 列表
+@app.get("/v1/api/wms/warehouse/versions")
 async def get_warehouse_version():
     query = warehouse_version.select()
     result = await database.fetch_all(query)
@@ -298,11 +310,12 @@ async def get_warehouse_version():
         "data" : result
     }
 
+
 # 线边库储位，版本
 @app.get("/v1/api/wms/line_storage/snapshot/list")
 async def get_line_storage_snapshot(ver: Optional[int] = None):
     ver_query = linestorage_version.select().order_by(linestorage_version.c.id.desc())
-    version = await database.fetch_one(ver_query)
+    outandin_ver = await database.fetch_one(ver_query)
 
     query = linestorage.select()
     result = await database.fetch_all(query)
@@ -317,44 +330,34 @@ async def get_line_storage_snapshot(ver: Optional[int] = None):
             materialList.append(plate)
         snapshot.append({"lineStorageCode": i.lineStorageCode, "materialList": materialList})
 
+    # 获取最新版本outandin
+    outandin_materialList_dict = json.loads(outandin_ver.materialList)
+    outandin_materialList = []
+    for key,value in outandin_materialList_dict.items():
+        plate = {}
+        plate['materialPlace'] = key
+        plate['materialCode'] = value
+        outandin_materialList.append(plate)
+
     outandin = [
-                    {
-                        "action":"in",
-                        "lineStorageCode":"LineStorage3",
-                        "materialList":[
-                            {
-                                "materialCode":"Ba01.01",
-                                "materialPlace":"3"
-                            },
-                        ]
-                    }
-                ]
+                {
+                    "action": outandin_ver.action,
+                    "lineStorageCode": outandin_ver.positionCode,
+                    "materialList": outandin_materialList
+                }
+            ]
+
     return_json = {
         "code" : 0,
         "message" : "数据处理成功！",
         "data" : {
-            "ver": version.id,
-            "snapshot": snapshot,
-            "outandin": outandin 
+            "ver":outandin_ver.id,
+            "snapshot":snapshot,
+            "outandin":outandin
         }
     }
     return return_json
 
-    """
-                    "outandin":[
-                    {
-                        "action":"in",
-                        "lineStorageCode":"LineStorage3",
-                        "materialList":[
-                            {
-                                "materialCode":"Ba01.01",
-                                "materialPlace":"3"
-                            },
-                        ]
-                    }
-                ],
-
-    """
 
 @app.get("/v1/api/wms/line_storage/bin/{bin_id}")
 async def get_line_storage_bin(bin_id: int, q: Optional[str] = None):
@@ -368,6 +371,7 @@ async def get_line_storage_bin(bin_id: int, q: Optional[str] = None):
         "data" : result
     }
     return return_json
+
 
 @app.put("/v1/api/wms/line_storage/bin/{bin_id}")
 async def update_line_storage_bin(bin_id: int, plate: LSPlate, q: Optional[str] = None):
@@ -385,9 +389,10 @@ async def update_line_storage_bin(bin_id: int, plate: LSPlate, q: Optional[str] 
     }
     return return_json
 
+# 创建新的linestorage version记录
 @app.post("/v1/api/wms/line_storage/version")
-async def create_line_storage_version():
-    query = linestorage_version.insert().values(created_date=datetime.datetime.now())
+async def create_line_storage_version(outandin: OutAndIn):
+    query = linestorage_version.insert().values(action=outandin.action, positionCode=outandin.positionCode, materialList=outandin.materialList, created_date=datetime.now())
     last_record_id = await database.execute(query)
     return {
         "code" : 0,
@@ -395,7 +400,8 @@ async def create_line_storage_version():
         "data" : {"id": last_record_id}
     }
 
-@app.get("/v1/api/wms/line_storage/version")
+# 获取linestorage_version 列表
+@app.get("/v1/api/wms/line_storage/versions")
 async def get_line_storage_version():
     query = linestorage_version.select()
     result = await database.fetch_all(query)
@@ -404,6 +410,7 @@ async def get_line_storage_version():
         "message" : "数据处理成功！",
         "data" : result
     }
+
 
 # 生产订单列表
 @app.put("/v1/api/order/produce/list")
@@ -418,17 +425,10 @@ async def update_order_list(order: Order):
         "data" : seq_list
     }
 
-@app.post("/v1/api/wms/produce_test")
-async def produce_test():
-    return {
-        "code" : 0,
-        "message" : "数据处理成功！",
-        "data" : {"produce": 'started!' }
-    }
 
 # fake
 @app.put("/v1/api/wms/warehouse/fake/{bin_id}")
-async def update_warehouse_bin(bin_id: int, q: Optional[str] = None):
+async def fake_update_warehouse_bin(bin_id: int, q: Optional[str] = None):
     isEmpty = 0
     # material_code = get_material_code(bin_id)
     # material_dict = get_material_dict
