@@ -238,12 +238,12 @@ def pre_load(order_list, siemens_1500, glock):
         thread_load.start()
 
 
-def pre_unload(siemens_1500, index, glock):
+def pre_unload(siemens_1500, line_no, glock):
     positionByte = 2
     enableByte = 1
     enableBit = 0
     enable = 1
-    thread_unload = threading.Thread(name="thread_unload", target=unload_action, args=(siemens_1500,index, positionByte,  enableByte, enableBit, enable, glock))
+    thread_unload = threading.Thread(name="thread_unload", target=unload_action, args=(siemens_1500, line_no, positionByte,  enableByte, enableBit, enable, glock))
     thread_unload.start()
 
 
@@ -274,8 +274,10 @@ def unload_trigger(glock):
 
     while True:
         if any(gloVar.line_get_ok_list):
-            index = gloVar.line_get_ok_list.index(True) + 1
-            pre_unload(siemens_1500, index, glock)
+            line_no = gloVar.line_get_ok_list.index(True) + 1
+            logger.info('=====unload_trigger  line_no=====')
+            logger.info(line_no)
+            pre_unload(siemens_1500, line_no, glock)
         time.sleep(0.5)
 
 

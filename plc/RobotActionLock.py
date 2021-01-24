@@ -365,7 +365,7 @@ def load_action(siemens_1500, positionByte,noByte,quantityByte, enableByte, enab
     print('---load_action---end-------')
 
 # 下料动作流程
-def unload_action(siemens_1500, index, positionByte, enableByte, enableBit, enable, glock):
+def unload_action(siemens_1500, line_no, positionByte, enableByte, enableBit, enable, glock):
     logger.info('---unload action----start-----')
     logger.info(datetime.datetime.now())
     print('---unload action----start-----')
@@ -377,51 +377,53 @@ def unload_action(siemens_1500, index, positionByte, enableByte, enableBit, enab
 
     i = 0
 
-    line_storage_url = line_storage_bin_url + str(index)
+    # 1.获取线边库托盘信息
+    line_storage_url = line_storage_bin_url + str(line_no)
     r = requests.get(line_storage_url)
     return_json = r.json()
     line_storage_bin = return_json['data']
     # print(line_storage_bin)
-    materialList = line_storage_bin[0]['materialList']
+    source_material_list = line_storage_bin[0]['materialList']
     source = line_storage_bin[0]['source']
 
     logger.info('source is:')
     logger.info(source)
     logger.info('materialList is:')
-    logger.info(materialList)   
+    logger.info(source_material_list)   
     
-    # 更新线边库
-    nullMaterialList = generate_line_storage_info_null(index)
+    # 2.更新线边库
+    nullMaterialList = generate_line_storage_info_null(line_no)
     param = {'isEmpty': 1,
     'materialList': nullMaterialList,
     'source': 0
     }
-
     payload = json.dumps(param)
     logger.info('====line_storage_info_null_payload====')
     logger.info(payload)
-
     response_put = requests.put(line_storage_url, data=payload)
     logger.info('line_storage_info_null response_put')
     logger.info(response_put.json())
+    # 3.创建linestorage outandin版本库
+    create_new_line_storage_version('Out', 'LineStorage'+str(line_no), source_material_list)
 
-    # POST MES
+    # 4.POST MES
     post_mes_line_storage()
 
     while True:
         # 放件完成，更新入库
         if gloVar.warehouse_put_ok:
-            # 更新数量
+            # 1.更新立库
             url = 'http://localhost:8088/v1/api/wms/warehouse/bin/' + str(source)
             param = {'isEmpty': 0,
-            'materialList': materialList
+            'materialList': source_material_list
             }
-
             payload = json.dumps(param)
             response_put = requests.put(url, data=payload)
-            # POST MES
+            #2. 创建新warehouse outandin版本
+            create_new_warehouse_version('In', '0'+str(source), source_material_list)
+            # 3.POST MES
             post_mes_warehouse()
-
+            # 4.退出下料流程
             break
         
         i += 1
@@ -434,6 +436,3 @@ def unload_action(siemens_1500, index, positionByte, enableByte, enableBit, enab
 
     logger.info('---unload action---end-------')
     print('---unload action---end-------')     
-
-
-
