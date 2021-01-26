@@ -105,7 +105,7 @@ def create_new_warehouse_version(action, positionCode, source_material_list):
     warehouse_version_post = requests.post(warehouse_version_url, data=payload)
     print('=====create_new_warehouse_version====')
     logger.info('=====create_new_warehouse_version====') 
-       
+
     logger.info('=====warehouse_version_post.json()====')
     logger.info(warehouse_version_post.json())  
     print('=====warehouse_version_post.json()====')
@@ -126,9 +126,11 @@ def create_new_line_storage_version(action, positionCode, source_material_list):
 
 # 更新线边库储位
 def update_line_storage_bin(line_storage_url, position, source_material_list):
+    logger.info('====line_storage_update_source_material_list===')
+    logger.info(source_material_list)
     try:
         param = {'isEmpty': 0,
-        'materialList': source_material_list[0]['materialList'],
+        'materialList': source_material_list,
         'source': position
         }
         payload = json.dumps(param)
@@ -314,8 +316,9 @@ def load_action(siemens_1500, positionByte,noByte,quantityByte, enableByte, enab
         # 上料流程
         while 1: 
             # 一、当堆垛机准备OK时，发给PLC机器人移动指令：
-            logger.info('====gloVar.ready_ok====')
-            logger.info(gloVar.ready_ok)
+
+            # logger.info('====gloVar.ready_ok====')
+            # logger.info(gloVar.ready_ok)
 
             if gloVar.ready_ok:
                 # logger.info('=====output no=====')
@@ -336,8 +339,9 @@ def load_action(siemens_1500, positionByte,noByte,quantityByte, enableByte, enab
                 can_write_flag = False
 
             # 二、当立库取件完成时，更新立库储位
-            logger.info('====gloVar.warehouse_get_ok====')
-            logger.info(gloVar.warehouse_get_ok)
+
+            # logger.info('====gloVar.warehouse_get_ok====')
+            # logger.info(gloVar.warehouse_get_ok)
 
             if gloVar.warehouse_get_ok:
                 # 1.出库使能复位
@@ -352,8 +356,9 @@ def load_action(siemens_1500, positionByte,noByte,quantityByte, enableByte, enab
 
             # 三、 当线边库放件完成时，更新线边库储位
             line_trigger = gloVar.line_put_ok_list[line_no-1]
-            logger.info('==line_trigger====')
-            logger.info(line_trigger)
+
+            # logger.info('==line_trigger====')
+            # logger.info(line_trigger)
 
             if line_trigger:
                 # 1.更新线边库储位

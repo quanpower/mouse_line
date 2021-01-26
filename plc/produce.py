@@ -262,10 +262,13 @@ def load_trigger(glock):
 
     while True:
         order_list = get_order_list()
-        if gloVar.pre_order_ok:
-            print('===load_trigger===')
-            logger.info('===load_trigger===')
-            pre_load(order_list, siemens_1500, glock)
+        # 有新订单时
+        if order_list:
+            if gloVar.pre_order_ok:
+                print('===load_trigger===')
+                logger.info('===load_trigger===')
+                pre_load(order_list, siemens_1500, glock)
+
         time.sleep(10)
 
 

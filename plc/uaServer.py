@@ -5,7 +5,8 @@ from global_list import gloVar
 import sys
 sys.path.insert(0, "..")
 
-logger = logging.getLogger(__name__)
+# logger = logging.getLogger(__name__)
+logger = logging.getLogger('uaServer')
 
 from opcua import ua, Server
 
