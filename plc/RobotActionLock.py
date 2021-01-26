@@ -54,25 +54,33 @@ def write_string_to_plc(s1500,string2plc,start):
 def get_source_material_list(warehouse_url):
     r = requests.get(warehouse_url)
     return_json = r.json()
-    source_material_list = return_json['data']
+    source_material_list_str = return_json['data'][0]['materialList']
 
-    print('======source_material_list=====')
-    print(source_material_list)
+    # print('======source_material_list_str=====')
+    # print(source_material_list_str)
+    # logger.info('======source_material_list_str=====')
+    # logger.info(source_material_list_str)
 
-    return source_material_list
+    return source_material_list_str
 
 
-# 从数据库materiallist源列表生成json列表
-def generate_material_list_json_from_source(source_material_list):
-    source_material_list_dict = json.loads(source_material_list)
-    source_material_list = []
-    for key,value in source_material_list_dict.items():
-        plate = {}
-        plate['materialPlace'] = key
-        plate['materialCode'] = value
-        source_material_list.append(plate)
+# # 从数据库materiallist源列表生成json列表
+# def (source_material_list_str):
+#     # print('===source_material_list_str===')
+#     # print(source_material_list_str)
+#     # print(type(source_material_list_str))
+#     logger.info('===source_material_list_str===')
+#     logger.info(source_material_list_str)
+
+#     source_material_list_dict = json.loads(source_material_list_str)
+#     source_material_list = []
+#     for key,value in source_material_list_dict.items():
+#         plate = {}
+#         plate['materialPlace'] = key
+#         plate['materialCode'] = value
+#         source_material_list.append(plate)
     
-    return source_material_list
+#     return source_material_list
 
 
 # 更新立库储位为空
@@ -91,19 +99,24 @@ def update_warehouse_null(warehouse_url,position):
 def create_new_warehouse_version(action, positionCode, source_material_list):
     param = {'action': action,
         'positionCode': positionCode,
-        'materialList': generate_material_list_json_from_source(source_material_list)
+        'materialList': source_material_list
     }                
     payload = json.dumps(param)
     warehouse_version_post = requests.post(warehouse_version_url, data=payload)
+    print('=====create_new_warehouse_version====')
+    logger.info('=====create_new_warehouse_version====') 
+       
     logger.info('=====warehouse_version_post.json()====')
     logger.info(warehouse_version_post.json())  
+    print('=====warehouse_version_post.json()====')
+    print(warehouse_version_post.json())      
 
 
 # 创建新的线边库outandin版本
 def create_new_line_storage_version(action, positionCode, source_material_list):
     param = {'action': action,
         'positionCode': positionCode,
-        'materialList': generate_material_list_json_from_source(source_material_list)
+        'materialList': source_material_list
     }                
     payload = json.dumps(param)
     line_storage_version_post = requests.post(line_storage_version_url, data=payload)
@@ -353,8 +366,8 @@ def load_action(siemens_1500, positionByte,noByte,quantityByte, enableByte, enab
                 break
 
             i += 1
-            logger.info('load_action i')
-            logger.info(i)
+            # logger.info('load_action i')
+            # logger.info(i)
             # 跳出while,结束上料
             if i >= 3000:
                 siemens_1500.write_bool_to_plc(38, enableByte, enableBit, 0)
@@ -427,8 +440,9 @@ def unload_action(siemens_1500, line_no, positionByte, enableByte, enableBit, en
             break
         
         i += 1
-        logger.info('unload_action i')
-        logger.info(i)
+        # logger.info('unload_action i')
+        # logger.info(i)
+
         # 跳出while,结束入库
         if i >= 600:
             return
