@@ -33,40 +33,40 @@ materials_position = {
     'A': {
         'box': [1,2,3,4,5,6],
         'bottom': {
-            'black': [7,8],
-            'white': [9,10],
-            'pink': [11,12]
+            'white': [7,8,11,12],
+            'black': [9,10],
+            'pink': []
         },
         'middle': {
-            'black': [13,14],
-            'white': [15,16],
-            'pink': [17,18]                                    
+            'white': [13,14,17,18],
+            'black': [15,16],
+            'pink': []                                    
         },
         'up': {
-            'black': [19,20],
-            'white': [21,22],
+            'white': [19,20],
+            'black': [21,22],
             'pink': [23,24]                                    
         },
         'battery': [25],
         'battery_lid': [26],                                 
     },
     'B': {
-        'box': [27,28,29,30,31,32],
+        'box': [27,28,29,30,31,32], 
         'bottom': {
-            'black': [33,34],
-            'white': [35,36],
-            'pink': [37,38]
+            'white': [33,34,37,38],
+            'black': [35,36],
+            'pink': []
         },
         'middle': {
-            'black': [39,40],
-            'white': [41,42],
-            'pink': [43,44]                                    
+            'white': [39,40,43,44],
+            'black': [41,42],
+            'pink': []                                    
         },
         'up': {
-            'black': [45,46],
-            'white': [47,48],
+            'white': [45,46],
+            'black': [47,48],
             'pink': [49,50]                                    
-        },    
+        },          
         'battery': [51],
         'battery_lid': [52],                             
     }
