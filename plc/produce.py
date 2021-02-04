@@ -26,9 +26,9 @@ def get_order_list():
         r = requests.get(uri)
         return_json = r.json()
         order_list = return_json['data']
-        sorted_order_list = sorted(order_list, key=operator.itemgetter('seq'))
+        # sorted_order_list = sorted(order_list, key=operator.itemgetter('seq'))
         # print(sorted_order_list)
-        return sorted_order_list
+        return order_list
     except Exception as e:
         print(e)
 
@@ -139,11 +139,14 @@ def generate_positions(order_list):
         send_sign_to_laser(productCode, signType, signValue)
 
 
+
+
         # 更新全局生产订单状态
         gloVar.orderNo = seq
         gloVar.productNo = productCode
         gloVar.state = 1
         gloVar.startTime = time.time()
+        gloVar.category = productCode[0:1]
 
         positions = []
         for i in materialList:
@@ -268,6 +271,7 @@ def load_trigger(glock):
                 print('===load_trigger===')
                 logger.info('===load_trigger===')
                 pre_load(order_list, siemens_1500, glock)
+
 
         time.sleep(10)
 

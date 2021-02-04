@@ -10,7 +10,7 @@ from PlcConn import plcConn
 from SystemStatusLock import query_system_status
 from RobotActionLock import in_action, out_action
 from camera import trigger_assembly_line_camara, trigger_warehouse_camara, shift_action, camera_trigger
-from produce import load_trigger, unload_trigger, in_trigger ,out_trigger
+from produce import load_trigger, unload_trigger, in_trigger, out_trigger
 from uaServer import ua_main
 from laser_client import client_send
 import threading 
@@ -108,24 +108,25 @@ def logger(log_obj):
 
     return logger
 
-def return_locator_code(locatorList):
 
+def return_locator_code(locatorList):
     for j in locatorList:
         index = int(j)
         if not gloVar.wssArray[index-1]:
             return index
 
+
 def return_position(warehouse, goods, color):
     if goods == 6:
         # box
         position = return_locator_code(warehouse['box'])
-    elif goods == 3:
+    elif goods == 1:
         # bottom
         position = return_locator_code(warehouse['bottom'][color])
     elif goods == 2:
         # middle
         position = return_locator_code(warehouse['middle'][color])
-    elif goods == 1:
+    elif goods == 3:
         # up
         position = return_locator_code(warehouse['up'][color])
     elif goods == 4:
@@ -138,6 +139,17 @@ def return_position(warehouse, goods, color):
         print('unknown!')  
         position = 0       
     return position
+
+def return_color_str(color):
+    if color == 1:
+        color_str = 'black'
+    elif color ==2:
+        color_str = 'white'
+    elif color ==3:
+        color_str = 'pink'
+    else:
+        color_str = 'error'        
+    return color_str
 class MyTCPHandler(socketserver.BaseRequestHandler):
     # def __init__(self, socket, host_port, server):
     #     self.server = server
@@ -207,8 +219,8 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
                             print(shift_a)
 
                             # ng==1 ,success
-                            # if int(ng) == 1:
-                            if 1:
+                            if int(ng) == 1:
+                            # if 1:
                                 if int(work_station) == 1:
                                     shiftxByte= 46
                                     shiftyByte = 50
@@ -277,25 +289,25 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
                             logger.info(ng)
                             logger.info(goods)
                             # ng==1 ,success
-                            # if ng == 1:
-                            if 1:
+                            if ng == 1:
+                            # if 1:
                                 print('camera data ok!')
                                 positionByte = 2
                                 enableByte = 1
                                 enableBit = 0
                                 enable = 1
-
+                                color_str = return_color_str(color)
                                 if category == 1:
                                     warehouse = materials_position['A']
-                                    position = return_position(warehouse, goods, color)
-                                elif category == 0:
+                                    position = return_position(warehouse, goods, color_str)
+                                elif category == 2:
                                     warehouse = materials_position['B']
-                                    position = return_position(warehouse, goods, color) 
+                                    position = return_position(warehouse, goods, color_str) 
 
                                 print('====position===')
                                 print(position)
 
-                                if position != 0:
+                                if position:
                                     thread_in = threading.Thread(name="thread_in", target=in_action, args=(siemens_1500, positionByte, position, enableByte, enableBit, enable, goods, glock))
                                     thread_in.start()   
                     else:
@@ -304,7 +316,7 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
                         action_list = []
 
             except ConnectionResetError as e:
-                print("err ",e)
+                print("err", e)
                 break
 
 
