@@ -206,6 +206,13 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
                             color = datalist[1]
                             category = datalist[2]
                             ng = datalist[3]
+
+                            print('====ng=====')
+                            print(ng)
+                            print(int(ng))
+                            print(int(ng) == 1)
+
+                            
                             shift_x = datalist[4]
                             shift_y = datalist[5]
                             shift_a = datalist[6]
@@ -273,6 +280,8 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
                             color = int(datalist[1])
                             category = int(datalist[2])
                             ng = int(datalist[3])
+                            print('===ng ====')
+                            print(type(ng))
                             goods = int(datalist[4])
 
                             print('=======camera1========')

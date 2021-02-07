@@ -139,8 +139,6 @@ def generate_positions(order_list):
         send_sign_to_laser(productCode, signType, signValue)
 
 
-
-
         # 更新全局生产订单状态
         gloVar.orderNo = seq
         gloVar.productNo = productCode
@@ -233,11 +231,11 @@ def pre_load(order_list, siemens_1500, glock):
     enableBit = 0
     enable = 1
 
-    seq = gloVar.orderNo
+    orderNo = gloVar.orderNo
     productCode = gloVar.productNo
 
     if out_list:
-        thread_load = threading.Thread(name="thread_load", target=load_action, args=(siemens_1500, positionByte, noByte, quantityByte, enableByte, enableBit, enable, out_list, seq, productCode, glock))
+        thread_load = threading.Thread(name="thread_load", target=load_action, args=(siemens_1500, positionByte, noByte, quantityByte, enableByte, enableBit, enable, out_list, orderNo, productCode, glock))
         thread_load.start()
 
 
@@ -271,8 +269,6 @@ def load_trigger(glock):
                 print('===load_trigger===')
                 logger.info('===load_trigger===')
                 pre_load(order_list, siemens_1500, glock)
-
-
         time.sleep(10)
 
 

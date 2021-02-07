@@ -33,6 +33,10 @@ def shift_action(siemens_1500, shiftxByte, shiftxValue,shiftyByte, shiftyValue,s
     print('---shift action----start-----')
     print(datetime.datetime.now())
     print(shiftxValue)
+    print(enableByte)
+    print(enableBit)
+    print(enableValue)
+
     with glock:
         siemens_1500.write_real_to_plc(38, shiftxByte, shiftxValue)
         siemens_1500.write_real_to_plc(38, shiftyByte, shiftyValue)

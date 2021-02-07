@@ -95,7 +95,7 @@ def ua_main():
     try:
         while True:
             time.sleep(0.5)
-
+zheli 
             duration = time.time() - gloVar.startTime
             # logger.info('Set value of %s to %.1f', order_1_duration, duration)
             order_1_orderNo.set_value(gloVar.orderNo)
