@@ -93,7 +93,7 @@ def send_sign_to_laser(productCode, signType, signValue):
     if signType == 0:
         print('none to laser!')
     elif signType == 1:
-        print('text to laser!')
+        print('==text to laser!===')
         '''A:GDM1=ABC123*GDM2=123ABC*JPG=D:\PLT\tongjian.jpg'''
         data = productCode[:1]+':GDM1=' + signValue
         print(data)
