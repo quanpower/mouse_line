@@ -144,7 +144,7 @@ def query_system_status(glock):
                     print(e)
                     logger.error(e)
 
-            time.sleep(0.2)
+            time.sleep(0.5)
             # time.sleep(0.2)
 
         except  Exception as e:

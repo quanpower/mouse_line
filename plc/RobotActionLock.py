@@ -54,25 +54,33 @@ def write_string_to_plc(s1500,string2plc,start):
 def get_source_material_list(warehouse_url):
     r = requests.get(warehouse_url)
     return_json = r.json()
-    source_material_list = return_json['data']
+    source_material_list_str = return_json['data'][0]['materialList']
 
-    print('======source_material_list=====')
-    print(source_material_list)
+    # print('======source_material_list_str=====')
+    # print(source_material_list_str)
+    # logger.info('======source_material_list_str=====')
+    # logger.info(source_material_list_str)
 
-    return source_material_list
+    return source_material_list_str
 
 
-# 从数据库materiallist源列表生成json列表
-def generate_material_list_json_from_source(source_material_list):
-    source_material_list_dict = json.loads(source_material_list)
-    source_material_list = []
-    for key,value in source_material_list_dict.items():
-        plate = {}
-        plate['materialPlace'] = key
-        plate['materialCode'] = value
-        source_material_list.append(plate)
+# # 从数据库materiallist源列表生成json列表
+# def (source_material_list_str):
+#     # print('===source_material_list_str===')
+#     # print(source_material_list_str)
+#     # print(type(source_material_list_str))
+#     logger.info('===source_material_list_str===')
+#     logger.info(source_material_list_str)
+
+#     source_material_list_dict = json.loads(source_material_list_str)
+#     source_material_list = []
+#     for key,value in source_material_list_dict.items():
+#         plate = {}
+#         plate['materialPlace'] = key
+#         plate['materialCode'] = value
+#         source_material_list.append(plate)
     
-    return source_material_list
+#     return source_material_list
 
 
 # 更新立库储位为空
@@ -91,19 +99,24 @@ def update_warehouse_null(warehouse_url,position):
 def create_new_warehouse_version(action, positionCode, source_material_list):
     param = {'action': action,
         'positionCode': positionCode,
-        'materialList': generate_material_list_json_from_source(source_material_list)
+        'materialList': source_material_list
     }                
     payload = json.dumps(param)
     warehouse_version_post = requests.post(warehouse_version_url, data=payload)
+    print('=====create_new_warehouse_version====')
+    logger.info('=====create_new_warehouse_version====') 
+
     logger.info('=====warehouse_version_post.json()====')
     logger.info(warehouse_version_post.json())  
+    print('=====warehouse_version_post.json()====')
+    print(warehouse_version_post.json())      
 
 
 # 创建新的线边库outandin版本
 def create_new_line_storage_version(action, positionCode, source_material_list):
     param = {'action': action,
         'positionCode': positionCode,
-        'materialList': generate_material_list_json_from_source(source_material_list)
+        'materialList': source_material_list
     }                
     payload = json.dumps(param)
     line_storage_version_post = requests.post(line_storage_version_url, data=payload)
@@ -113,9 +126,11 @@ def create_new_line_storage_version(action, positionCode, source_material_list):
 
 # 更新线边库储位
 def update_line_storage_bin(line_storage_url, position, source_material_list):
+    logger.info('====line_storage_update_source_material_list===')
+    logger.info(source_material_list)
     try:
         param = {'isEmpty': 0,
-        'materialList': source_material_list[0]['materialList'],
+        'materialList': source_material_list,
         'source': position
         }
         payload = json.dumps(param)
@@ -301,8 +316,9 @@ def load_action(siemens_1500, positionByte,noByte,quantityByte, enableByte, enab
         # 上料流程
         while 1: 
             # 一、当堆垛机准备OK时，发给PLC机器人移动指令：
-            logger.info('====gloVar.ready_ok====')
-            logger.info(gloVar.ready_ok)
+
+            # logger.info('====gloVar.ready_ok====')
+            # logger.info(gloVar.ready_ok)
 
             if gloVar.ready_ok:
                 # logger.info('=====output no=====')
@@ -323,8 +339,9 @@ def load_action(siemens_1500, positionByte,noByte,quantityByte, enableByte, enab
                 can_write_flag = False
 
             # 二、当立库取件完成时，更新立库储位
-            logger.info('====gloVar.warehouse_get_ok====')
-            logger.info(gloVar.warehouse_get_ok)
+
+            # logger.info('====gloVar.warehouse_get_ok====')
+            # logger.info(gloVar.warehouse_get_ok)
 
             if gloVar.warehouse_get_ok:
                 # 1.出库使能复位
@@ -339,8 +356,9 @@ def load_action(siemens_1500, positionByte,noByte,quantityByte, enableByte, enab
 
             # 三、 当线边库放件完成时，更新线边库储位
             line_trigger = gloVar.line_put_ok_list[line_no-1]
-            logger.info('==line_trigger====')
-            logger.info(line_trigger)
+
+            # logger.info('==line_trigger====')
+            # logger.info(line_trigger)
 
             if line_trigger:
                 # 1.更新线边库储位
@@ -353,8 +371,8 @@ def load_action(siemens_1500, positionByte,noByte,quantityByte, enableByte, enab
                 break
 
             i += 1
-            logger.info('load_action i')
-            logger.info(i)
+            # logger.info('load_action i')
+            # logger.info(i)
             # 跳出while,结束上料
             if i >= 3000:
                 siemens_1500.write_bool_to_plc(38, enableByte, enableBit, 0)
@@ -365,7 +383,7 @@ def load_action(siemens_1500, positionByte,noByte,quantityByte, enableByte, enab
     print('---load_action---end-------')
 
 # 下料动作流程
-def unload_action(siemens_1500, index, positionByte, enableByte, enableBit, enable, glock):
+def unload_action(siemens_1500, line_no, positionByte, enableByte, enableBit, enable, glock):
     logger.info('---unload action----start-----')
     logger.info(datetime.datetime.now())
     print('---unload action----start-----')
@@ -377,56 +395,59 @@ def unload_action(siemens_1500, index, positionByte, enableByte, enableBit, enab
 
     i = 0
 
-    line_storage_url = line_storage_bin_url + str(index)
+    # 1.获取线边库托盘信息
+    line_storage_url = line_storage_bin_url + str(line_no)
     r = requests.get(line_storage_url)
     return_json = r.json()
     line_storage_bin = return_json['data']
     # print(line_storage_bin)
-    materialList = line_storage_bin[0]['materialList']
+    source_material_list = line_storage_bin[0]['materialList']
     source = line_storage_bin[0]['source']
 
     logger.info('source is:')
     logger.info(source)
     logger.info('materialList is:')
-    logger.info(materialList)   
+    logger.info(source_material_list)   
     
-    # 更新线边库
-    nullMaterialList = generate_line_storage_info_null(index)
+    # 2.更新线边库
+    nullMaterialList = generate_line_storage_info_null(line_no)
     param = {'isEmpty': 1,
     'materialList': nullMaterialList,
     'source': 0
     }
-
     payload = json.dumps(param)
     logger.info('====line_storage_info_null_payload====')
     logger.info(payload)
-
     response_put = requests.put(line_storage_url, data=payload)
     logger.info('line_storage_info_null response_put')
     logger.info(response_put.json())
+    # 3.创建linestorage outandin版本库
+    create_new_line_storage_version('Out', 'LineStorage'+str(line_no), source_material_list)
 
-    # POST MES
+    # 4.POST MES
     post_mes_line_storage()
 
     while True:
         # 放件完成，更新入库
         if gloVar.warehouse_put_ok:
-            # 更新数量
+            # 1.更新立库
             url = 'http://localhost:8088/v1/api/wms/warehouse/bin/' + str(source)
             param = {'isEmpty': 0,
-            'materialList': materialList
+            'materialList': source_material_list
             }
-
             payload = json.dumps(param)
             response_put = requests.put(url, data=payload)
-            # POST MES
+            #2. 创建新warehouse outandin版本
+            create_new_warehouse_version('In', '0'+str(source), source_material_list)
+            # 3.POST MES
             post_mes_warehouse()
-
+            # 4.退出下料流程
             break
         
         i += 1
-        logger.info('unload_action i')
-        logger.info(i)
+        # logger.info('unload_action i')
+        # logger.info(i)
+
         # 跳出while,结束入库
         if i >= 600:
             return
@@ -434,6 +455,3 @@ def unload_action(siemens_1500, index, positionByte, enableByte, enableBit, enab
 
     logger.info('---unload action---end-------')
     print('---unload action---end-------')     
-
-
-

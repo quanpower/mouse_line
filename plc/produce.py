@@ -26,9 +26,9 @@ def get_order_list():
         r = requests.get(uri)
         return_json = r.json()
         order_list = return_json['data']
-        sorted_order_list = sorted(order_list, key=operator.itemgetter('seq'))
+        # sorted_order_list = sorted(order_list, key=operator.itemgetter('seq'))
         # print(sorted_order_list)
-        return sorted_order_list
+        return order_list
     except Exception as e:
         print(e)
 
@@ -93,7 +93,7 @@ def send_sign_to_laser(productCode, signType, signValue):
     if signType == 0:
         print('none to laser!')
     elif signType == 1:
-        print('text to laser!')
+        print('==text to laser!===')
         '''A:GDM1=ABC123*GDM2=123ABC*JPG=D:\PLT\tongjian.jpg'''
         data = productCode[:1]+':GDM1=' + signValue
         print(data)
@@ -144,6 +144,7 @@ def generate_positions(order_list):
         gloVar.productNo = productCode
         gloVar.state = 1
         gloVar.startTime = time.time()
+        gloVar.category = productCode[0:1]
 
         positions = []
         for i in materialList:
@@ -230,20 +231,20 @@ def pre_load(order_list, siemens_1500, glock):
     enableBit = 0
     enable = 1
 
-    seq = gloVar.orderNo
+    orderNo = gloVar.orderNo
     productCode = gloVar.productNo
 
     if out_list:
-        thread_load = threading.Thread(name="thread_load", target=load_action, args=(siemens_1500, positionByte, noByte, quantityByte, enableByte, enableBit, enable, out_list, seq, productCode, glock))
+        thread_load = threading.Thread(name="thread_load", target=load_action, args=(siemens_1500, positionByte, noByte, quantityByte, enableByte, enableBit, enable, out_list, orderNo, productCode, glock))
         thread_load.start()
 
 
-def pre_unload(siemens_1500, index, glock):
+def pre_unload(siemens_1500, line_no, glock):
     positionByte = 2
     enableByte = 1
     enableBit = 0
     enable = 1
-    thread_unload = threading.Thread(name="thread_unload", target=unload_action, args=(siemens_1500,index, positionByte,  enableByte, enableBit, enable, glock))
+    thread_unload = threading.Thread(name="thread_unload", target=unload_action, args=(siemens_1500, line_no, positionByte,  enableByte, enableBit, enable, glock))
     thread_unload.start()
 
 
@@ -262,10 +263,12 @@ def load_trigger(glock):
 
     while True:
         order_list = get_order_list()
-        if gloVar.pre_order_ok:
-            print('===load_trigger===')
-            logger.info('===load_trigger===')
-            pre_load(order_list, siemens_1500, glock)
+        # 有新订单时
+        if order_list:
+            if gloVar.pre_order_ok:
+                print('===load_trigger===')
+                logger.info('===load_trigger===')
+                pre_load(order_list, siemens_1500, glock)
         time.sleep(10)
 
 
@@ -274,8 +277,10 @@ def unload_trigger(glock):
 
     while True:
         if any(gloVar.line_get_ok_list):
-            index = gloVar.line_get_ok_list.index(True) + 1
-            pre_unload(siemens_1500, index, glock)
+            line_no = gloVar.line_get_ok_list.index(True) + 1
+            logger.info('=====unload_trigger  line_no=====')
+            logger.info(line_no)
+            pre_unload(siemens_1500, line_no, glock)
         time.sleep(0.5)
 
 
