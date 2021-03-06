@@ -402,7 +402,7 @@ def get_material_dict():
     return material_dict
 
 
-def generate_material_list_json(bin_id，quantity):
+def generate_material_list_json(bin_id,quantity):
     
     if bin_id >= 1 and bin_id <= 6 or bin_id >= 27 and bin_id <= 32:
         materialList = generate_plate_info_json(quantity，7, 'Na01.01') 
