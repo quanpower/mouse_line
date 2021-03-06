@@ -402,51 +402,51 @@ def get_material_dict():
     return material_dict
 
 
-def generate_material_list_json(bin_id,quantity):
+def generate_material_list_json(bin_id, start):
     
     if bin_id >= 1 and bin_id <= 6 or bin_id >= 27 and bin_id <= 32:
-        materialList = generate_plate_info_json(quantity，7, 'Na01.01') 
+        materialList = generate_plate_info_json(start, 7, 'Na01.01') 
     elif bin_id >= 7 and bin_id <= 8:
-        materialList = generate_plate_info_json(quantity，10, "Za01.01") 
+        materialList = generate_plate_info_json(start, 10, "Za01.01") 
     elif bin_id >= 9 and bin_id <= 10:
-        materialList = generate_plate_info_json(quantity，10, "Za01.02")
+        materialList = generate_plate_info_json(start, 10, "Za01.02")
     elif bin_id >= 11 and bin_id <= 12:
-        materialList = generate_plate_info_json(quantity，10, "Za01.03")  
+        materialList = generate_plate_info_json(start, 10, "Za01.03")  
     elif bin_id >= 13 and bin_id <= 14:
-        materialList = generate_plate_info_json(quantity，10, "Za02.01") 
+        materialList = generate_plate_info_json(start, 10, "Za02.01") 
     elif bin_id >= 15 and bin_id <= 16:
-        materialList = generate_plate_info_json(quantity，10, "Za02.02")
+        materialList = generate_plate_info_json(start, 10, "Za02.02")
     elif bin_id >= 17 and bin_id <= 18:
-        materialList = generate_plate_info_json(quantity，10, "Za02.03") 
+        materialList = generate_plate_info_json(start, 10, "Za02.03") 
     elif bin_id >= 19 and bin_id <= 20:
-        materialList = generate_plate_info_json(quantity，10, "Za03.01") 
+        materialList = generate_plate_info_json(start, 10, "Za03.01") 
     elif bin_id >= 21 and bin_id <= 22:
-        materialList = generate_plate_info_json(quantity，10, "Za03.02")
+        materialList = generate_plate_info_json(start, 10, "Za03.02")
     elif bin_id >= 23 and bin_id <= 24:
-        materialList = generate_plate_info_json(quantity，10, "Za03.03")       
+        materialList = generate_plate_info_json(start, 10, "Za03.03")       
     elif bin_id == 25 or bin_id == 51:
-        materialList = generate_plate_info_json(quantity，55, 'Ba01.01') 
+        materialList = generate_plate_info_json(start, 55, 'Ba01.01') 
     elif bin_id == 26 or bin_id == 52:
-        materialList = generate_plate_info_json(quantity，53, 'Ba02.05') 
+        materialList = generate_plate_info_json(start, 53, 'Ba02.05') 
 
     elif bin_id >= 33 and bin_id <= 34:
-        materialList = generate_plate_info_json(quantity，10, "Za01.04") 
+        materialList = generate_plate_info_json(start, 10, "Za01.04") 
     elif bin_id >= 35 and bin_id <= 36:
-        materialList = generate_plate_info_json(quantity，10, "Za01.05")
+        materialList = generate_plate_info_json(start, 10, "Za01.05")
     elif bin_id >= 37 and bin_id <= 38:
-        materialList = generate_plate_info_json(quantity，10, "Za01.06")  
+        materialList = generate_plate_info_json(start, 10, "Za01.06")  
     elif bin_id >= 39 and bin_id <= 40:
-        materialList = generate_plate_info_json(quantity，10, "Za02.04") 
+        materialList = generate_plate_info_json(start, 10, "Za02.04") 
     elif bin_id >= 41 and bin_id <= 42:
-        materialList = generate_plate_info_json(quantity，10, "Za02.05")
+        materialList = generate_plate_info_json(start, 10, "Za02.05")
     elif bin_id >= 43 and bin_id <= 44:
-        materialList = generate_plate_info_json(quantity，10, "Za02.06") 
+        materialList = generate_plate_info_json(start, 10, "Za02.06") 
     elif bin_id >= 45 and bin_id <= 46:
-        materialList = generate_plate_info_json(quantity，10, "Za03.04") 
+        materialList = generate_plate_info_json(start, 10, "Za03.04") 
     elif bin_id >= 47 and bin_id <= 48:
-        materialList = generate_plate_info_json(quantity，10, "Za03.05")
+        materialList = generate_plate_info_json(start, 10, "Za03.05")
     elif bin_id >= 49 and bin_id <= 50:
-        materialList = generate_plate_info_json(quantity，10, "Za03.06") 
+        materialList = generate_plate_info_json(start, 10, "Za03.06") 
 
     else:
         print('unknown!')
