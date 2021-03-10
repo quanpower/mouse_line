@@ -83,6 +83,8 @@ def generate_material_storage_init():
 
 def generate_plate_info_json(start, end, materialCode):
     temp_dict = {}
+    for i in range(1, start):
+        temp_dict[str(i)] = 'null'
     for i in range(start, end):
         temp_dict[str(i)] = materialCode
     # print(temp_dict)
