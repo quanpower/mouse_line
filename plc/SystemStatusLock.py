@@ -67,7 +67,7 @@ def query_system_status(glock):
                     # print('===camera_trigger===')
                     camera_triggers = int2bitarray(ct[0], 8)
                     # print(camera_triggers)
-                    # 准备完成
+                    # 准备完成,上料使能
                     ready_ok = camera_triggers[7]
 
                     # 托盘检测

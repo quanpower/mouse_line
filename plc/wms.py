@@ -13,7 +13,7 @@ import requests
 from utils import generate_materials_list, generate_plate_info_json, generate_warehouse_info, \
     generate_warehouse_info_init, generate_line_storage_info, \
     generate_line_storage_info_init, generate_material_storage_init, get_material_dict, generate_material_list_json, \
-        generate_warehouse_version_init, generate_linestorage_version_init
+        generate_warehouse_version_init, generate_linestorage_version_init, generate_null_material_list_json
 
 app = FastAPI()
 
@@ -417,9 +417,9 @@ async def update_order_list(order: Order):
     }
 
 
-# fake
-@app.put("/v1/api/wms/warehouse/fake/{bin_id}")
-async def fake_update_warehouse_bin(bin_id: int, start: int = 1):
+# fake in
+@app.put("/v1/api/wms/warehouse/fake_in/{bin_id}")
+async def fake_in_update_warehouse_bin(bin_id: int, start: int = 1):
     isEmpty = 0
     # material_code = get_material_code(bin_id)
     # material_dict = get_material_dict
@@ -436,6 +436,25 @@ async def fake_update_warehouse_bin(bin_id: int, start: int = 1):
     }
     return return_json
 
+
+# fake out
+@app.put("/v1/api/wms/warehouse/fake_out/{bin_id}")
+async def fake_out_update_warehouse_bin(bin_id: int):
+    isEmpty = 1
+    # material_code = get_material_code(bin_id)
+    # material_dict = get_material_dict
+    # material_code = get_material_code(material_dict, bin_id)
+    # print(material_code)
+    materialList= generate_null_material_list_json(bin_id)
+    query = warehouse.update().where(warehouse.c.id==bin_id).values(isEmpty=isEmpty, materialList=materialList)
+    last_record_id = await database.execute(query)
+
+    return_json = {
+        "code" : 0,
+        "message" : "数据处理成功！",
+        "data" : {"id": last_record_id, "bin_id": bin_id}
+    }
+    return return_json
 
 if __name__ == '__main__':
     uvicorn.run(app=app, host="0.0.0.0", port=8088, debug=True)        
