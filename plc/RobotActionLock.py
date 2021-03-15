@@ -223,8 +223,9 @@ def in_action(siemens_1500, positionByte, position, enableByte, enableBit, enabl
             # elif goods == 5:
             #     # battery_lid
             #     material_list = generate_plate_info_json(1,53,material_code)
-            # todo:
-            material_list = generate_material_list_json(position, start)
+            
+            # 入库，默认从第一个开始，满盘
+            material_list = generate_material_list_json(position, 1)
 
             url = 'http://localhost:8088/v1/api/wms/warehouse/bin/' + str(position)
             param = {'isEmpty': 0,

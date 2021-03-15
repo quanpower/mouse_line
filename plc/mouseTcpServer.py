@@ -4,7 +4,7 @@
 
 import sys
 import os
-from socketserver import TCPServer, StreamRequestHandler
+from socketserver import TCPServer, StreamRequestHandler, ThreadingTCPServer
 from utils import bcd2time, byte2string, checksum, int2bitarray
 from PlcConn import plcConn
 from SystemStatusLock import query_system_status
@@ -140,17 +140,26 @@ def return_position(warehouse, goods, color):
         position = 0       
     return position
 
+
 def return_color_str(color):
     if color == 1:
         color_str = 'black'
     elif color ==2:
         color_str = 'white'
     elif color ==3:
-        color_str = 'pink'
+        color_str = 'grey'
     else:
         color_str = 'error'        
     return color_str
-class MyTCPHandler(socketserver.BaseRequestHandler):
+
+
+class MyThreadingTCPServer(ThreadingTCPServer):
+    """重写socketserver.ThreadingTCPServer"""
+    # 服务停止后即刻释放端口，无需等待tcp连接断开
+    allow_reuse_address = True
+
+
+class MyTCPHandler(StreamRequestHandler):
     # def __init__(self, socket, host_port, server):
     #     self.server = server
     #     self.socket = socket
@@ -164,10 +173,21 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
 
     #     # print(gloVar.sockets)
 
+
+    ip = ""  
+    port = 0  
+    timeOut = 180     # 设置超时时间变量 
+
+    def setup(self):  
+        self.ip = self.client_address[0].strip()     # 获取客户端的ip  
+        self.port = self.client_address[1]           # 获取客户端的port  
+        self.request.settimeout(self.timeOut)        # 对socket设置超时时间  
+        print(self.ip+":"+str(self.port)+"连接到服务器！")  
+
     def handle(self):  #所有请求的交互都是在handle里执行的,
         print(self.request)
         print(self.client_address[0])
-        client_address = self.client_address[0]
+        client_address = self.client_address[0].strip()  
         print(client_address)
         gloVar.sockets[client_address] = self.request
         print(gloVar.sockets)
@@ -175,7 +195,7 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
         global isNew
         while True:
             try:
-                self.data = self.request.recv(1024).strip()#每一个请求都会实例化MyTCPHandler(socketserver.BaseRequestHandler):
+                self.data = self.request.recv(1024).strip()
                 siemens_1500 = gloVar.siemens_1500
 
                 if len(self.data) < 1:
@@ -201,7 +221,8 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
                         datalist = data_tuple[1].split(',')   
                         datalist_length = len(datalist)
                         
-                        if datalist_length > 6:
+                        if datalist_length > 6 and datalist_length <= 8:
+                            # 2-5相机偏移测量
                             work_station = datalist[0]
                             color = datalist[1]
                             category = datalist[2]
@@ -212,7 +233,6 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
                             print(int(ng))
                             print(int(ng) == 1)
 
-                            
                             shift_x = datalist[4]
                             shift_y = datalist[5]
                             shift_a = datalist[6]
@@ -276,6 +296,7 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
                                 thread_shift.start()
 
                         elif datalist_length <= 6 and datalist_length >=3:
+                            # 1号相机上料测量普通托盘
                             quantity = int(datalist[0])
                             color = int(datalist[1])
                             category = int(datalist[2])
@@ -300,7 +321,7 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
                             # ng==1 ,success
                             if ng == 1:
                             # if 1:
-                                print('camera data ok!')
+                                print('==camera data ok!===')
                                 positionByte = 2
                                 enableByte = 1
                                 enableBit = 0
@@ -318,7 +339,45 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
 
                                 if position:
                                     thread_in = threading.Thread(name="thread_in", target=in_action, args=(siemens_1500, positionByte, position, enableByte, enableBit, enable, goods, glock))
-                                    thread_in.start()   
+                                    thread_in.start()  
+
+                        elif datalist_length >8 :
+                            # 1号相机上料测量电池盖
+                            b_quantity = int(datalist[0])
+                            b_color = int(datalist[1])
+                            b_category = int(datalist[2])
+                            b_ng = int(datalist[3])
+                            print('===b_ ====')
+                            print(type(b_))
+                            b_goods = int(datalist[4])
+
+
+                            w_quantity = int(datalist[5])
+                            w_color = int(datalist[6])
+                            w_category = int(datalist[7])
+                            w_ng = int(datalist[8])
+                            print('===w_ ====')
+                            print(type(w_))
+                            w_goods = int(datalist[9])
+                            print('=======camera1========')
+
+
+                            if b_ng == 1 and  w_ng == 1:
+                            # if 1:
+                                print('==battery_lid camera data ok!===')
+                                positionByte = 2
+                                enableByte = 1
+                                enableBit = 0
+                                enable = 1
+
+                                # 26,52
+                                position = return_locator_code([26, 52])
+                                print('====position===')
+                                print(position)
+
+                                if position:
+                                    thread_in = threading.Thread(name="thread_in", target=in_action, args=(siemens_1500, positionByte, position, enableByte, enableBit, enable, goods, glock))
+                                    thread_in.start()                                      
                     else:
                         print('unhandled!')
                         print(data_tuple)
@@ -328,6 +387,10 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
                 print("err", e)
                 break
 
+    def finish(self):  
+        print(self.ip+":"+str(self.port)+"断开连接！")  
+        # 断开时删除本socket
+        # client_sockets.pop(self.ip)
 
 if __name__ == "__main__":
 
@@ -357,7 +420,6 @@ if __name__ == "__main__":
         # 循环读取下料订单，准备下料
         thread_unload_trigger = threading.Thread(name='thread_unload_trigger', target=unload_trigger, args=(glock,))
         thread_unload_trigger.start()
-
 
         # 循环读取生产订单，上报opc ua server
         thread_ua_main = threading.Thread(name='thread_ua_main', target=ua_main)

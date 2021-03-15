@@ -91,7 +91,7 @@ def get_line_storage_code(materialCode):
 # 激光打印签名
 def send_sign_to_laser(productCode, signType, signValue):
     if signType == 0:
-        print('none to laser!')
+        print('==none to laser!==')
     elif signType == 1:
         print('==text to laser!===')
         '''A:GDM1=ABC123*GDM2=123ABC*JPG=D:\PLT\tongjian.jpg'''
@@ -102,7 +102,7 @@ def send_sign_to_laser(productCode, signType, signValue):
         thread_laser = threading.Thread(name="thread_laser", target=client_send, args=(data,))
         thread_laser.start()         
     elif signType == 2:
-        print('jpeg to laser!')
+        print('====jpeg to laser!===')
         file_name = os.path.basename(signValue)
         file_path = "D:\\PLT\\" + file_name
         print(signValue)
@@ -115,7 +115,8 @@ def send_sign_to_laser(productCode, signType, signValue):
             with open( file_path,'wb' ) as f:
                 f.write(img)
 
-            data = productCode[:1]+ ":JPG=" + file_path
+            # 图片发A1:JPG=****
+            data = productCode[:1]+ "1:JPG=" + file_path
             logger.info('====jpeg to laser!===')
             logger.info(data)        
             thread_laser = threading.Thread(name="thread_laser", target=client_send, args=(data,))
