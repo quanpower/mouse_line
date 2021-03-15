@@ -2,35 +2,36 @@ import requests
 import json
 import datetime
 
+# 生成物料列表
 def generate_materials_list():
     materialsList = [
         {"id":1, "materialCode": "Za01.01", "materialName": "白色充电款底壳", "materialClass":"Za01", "description":"底壳" },
         {"id":2, "materialCode": "Za01.02", "materialName": "黑色充电款底壳", "materialClass":"Za01", "description":"底壳" },
-        {"id":3, "materialCode": "Za01.03", "materialName": "粉色充电款底壳", "materialClass":"Za01", "description":"底壳" },
+        {"id":3, "materialCode": "Za01.03", "materialName": "灰色充电款底壳", "materialClass":"Za01", "description":"底壳" },
         {"id":4, "materialCode": "Za01.04", "materialName": "白色电池款底壳", "materialClass":"Za01", "description":"底壳" },
         {"id":5, "materialCode": "Za01.05", "materialName": "黑色电池款底壳", "materialClass":"Za01", "description":"底壳" },
-        {"id":6, "materialCode": "Za01.06", "materialName": "粉色电池款底壳", "materialClass":"Za01", "description":"底壳" },
+        {"id":6, "materialCode": "Za01.06", "materialName": "灰色电池款底壳", "materialClass":"Za01", "description":"底壳" },
 
         {"id":7, "materialCode": "Za02.01", "materialName": "白色充电款中壳", "materialClass":"Za02", "description":"中壳" },
         {"id":8, "materialCode": "Za02.02", "materialName": "黑色充电款中壳", "materialClass":"Za02", "description":"中壳" },
-        {"id":9, "materialCode": "Za02.03", "materialName": "粉色充电款中壳", "materialClass":"Za02", "description":"中壳" },
+        {"id":9, "materialCode": "Za02.03", "materialName": "灰色充电款中壳", "materialClass":"Za02", "description":"中壳" },
         {"id":10, "materialCode": "Za02.04", "materialName": "白色电池款中壳", "materialClass":"Za02", "description":"中壳" },
         {"id":11, "materialCode": "Za02.05", "materialName": "黑色电池款中壳", "materialClass":"Za02", "description":"中壳" },
-        {"id":12, "materialCode": "Za02.06", "materialName": "粉色电池款中壳", "materialClass":"Za02", "description":"中壳" },
+        {"id":12, "materialCode": "Za02.06", "materialName": "灰色电池款中壳", "materialClass":"Za02", "description":"中壳" },
 
         {"id":13, "materialCode": "Za03.01", "materialName": "白色充电款上壳", "materialClass":"Za03", "description":"上壳" },
         {"id":14, "materialCode": "Za03.02", "materialName": "黑色充电款上壳", "materialClass":"Za03", "description":"上壳" },
-        {"id":15, "materialCode": "Za03.03", "materialName": "粉色充电款上壳", "materialClass":"Za03", "description":"上壳" },
+        {"id":15, "materialCode": "Za03.03", "materialName": "灰色充电款上壳", "materialClass":"Za03", "description":"上壳" },
         {"id":16, "materialCode": "Za03.04", "materialName": "白色电池款上壳", "materialClass":"Za03", "description":"上壳" },
         {"id":17, "materialCode": "Za03.05", "materialName": "黑色电池款上壳", "materialClass":"Za03", "description":"上壳" },
-        {"id":18, "materialCode": "Za03.06", "materialName": "粉色电池款上壳", "materialClass":"Za03", "description":"上壳" },
+        {"id":18, "materialCode": "Za03.06", "materialName": "灰色电池款上壳", "materialClass":"Za03", "description":"上壳" },
 
         {"id":19, "materialCode": "Ba02.01", "materialName": "白色充电款电池盖", "materialClass":"Ba02", "description":"电池盖" },
         {"id":20, "materialCode": "Ba02.02", "materialName": "黑色充电款电池盖", "materialClass":"Ba02", "description":"电池盖" },
-        {"id":21, "materialCode": "Ba02.03", "materialName": "粉色充电款电池盖", "materialClass":"Ba02", "description":"电池盖" },
+        {"id":21, "materialCode": "Ba02.03", "materialName": "灰色充电款电池盖", "materialClass":"Ba02", "description":"电池盖" },
         {"id":22, "materialCode": "Ba02.04", "materialName": "白色电池款电池盖", "materialClass":"Ba02", "description":"电池盖" },
         {"id":23, "materialCode": "Ba02.05", "materialName": "黑色电池款电池盖", "materialClass":"Ba02", "description":"电池盖" },
-        {"id":24, "materialCode": "Ba02.06", "materialName": "粉色电池款电池盖", "materialClass":"Ba02", "description":"电池盖" },
+        {"id":24, "materialCode": "Ba02.06", "materialName": "灰色电池款电池盖", "materialClass":"Ba02", "description":"电池盖" },
         
         {"id":25, "materialCode": "Ba01.01", "materialName": "电池", "materialClass":"Ba01", "description":"电池" },
         
@@ -40,7 +41,7 @@ def generate_materials_list():
     ]
     return materialsList
 
-
+# 生成仓储格位
 def generate_material_storage_init():
     material_storage = [
         {"id":1, "materialCode": "Za01.01", "locatorCode": "7,8"},
@@ -80,7 +81,7 @@ def generate_material_storage_init():
 
     return material_storage
 
-
+# 生成托盘格位信息
 def generate_plate_info_json(start, end, materialCode):
     temp_dict = {}
     for i in range(1, start):
@@ -93,42 +94,29 @@ def generate_plate_info_json(start, end, materialCode):
 
     return temp_json
 
-
-def generate_unload_plate_info_json(start, end, materialCode):
-    temp_dict = {}
-    for i in range(1, start):
-        temp_dict[str(i)] = 'null'
-    for i in range(start, end):
-        temp_dict[str(i)] = materialCode
-    # print(temp_dict)
-    temp_json = json.dumps(temp_dict)
-    # print(temp_json)
-
-    return temp_json
-
-
+# 模拟仓库全满时用
 def generate_warehouse_info():
     box_json = generate_plate_info_json(1,7,'Na01.01') 
 
     a_white_bottom_json = generate_plate_info_json(1,10,'Za01.01') 
     a_black_bottom_json = generate_plate_info_json(1,10,'Za01.02') 
-    a_pink_bottom_json = generate_plate_info_json(1,10,'Za01.03') 
+    a_grey_bottom_json = generate_plate_info_json(1,10,'Za01.03') 
     a_white_middle_json = generate_plate_info_json(1,10,'Za02.01') 
     a_black_middle_json = generate_plate_info_json(1,10,'Za02.02') 
-    a_pink_middle_json = generate_plate_info_json(1,10,'Za02.03') 
+    a_grey_middle_json = generate_plate_info_json(1,10,'Za02.03') 
     a_white_up_json = generate_plate_info_json(1,10,'Za03.01') 
     a_black_up_json = generate_plate_info_json(1,10,'Za03.02') 
-    a_pink_up_json = generate_plate_info_json(1,10,'Za03.03') 
+    a_grey_up_json = generate_plate_info_json(1,10,'Za03.03') 
 
     b_white_bottom_json = generate_plate_info_json(1,10,'Za01.04') 
     b_black_bottom_json = generate_plate_info_json(1,10,'Za01.05') 
-    b_pink_bottom_json = generate_plate_info_json(1,10,'Za01.06') 
+    b_grey_bottom_json = generate_plate_info_json(1,10,'Za01.06') 
     b_white_middle_json = generate_plate_info_json(1,10,'Za01.04') 
     b_black_middle_json = generate_plate_info_json(1,10,'Za02.05') 
-    b_pink_middle_json = generate_plate_info_json(1,10,'Za03.06') 
+    b_grey_middle_json = generate_plate_info_json(1,10,'Za03.06') 
     b_white_up_json = generate_plate_info_json(1,10,'Za01.04') 
     b_black_up_json = generate_plate_info_json(1,10,'Za02.05') 
-    b_pink_up_json = generate_plate_info_json(1,10,'Za03.06') 
+    b_grey_up_json = generate_plate_info_json(1,10,'Za03.06') 
 
     battery_json = generate_plate_info_json(1,55,'Ba01.01')
 
@@ -147,26 +135,26 @@ def generate_warehouse_info():
         {"id":5, "locatorCode": "005", "isEmpty":False, "materialList":box_json},
         {"id":6, "locatorCode": "006", "isEmpty":False, "materialList":box_json},
 
-        {"id":7, "locatorCode": "007", "isEmpty":False, "materialList":a_black_bottom_json},
-        {"id":8, "locatorCode": "008", "isEmpty":False, "materialList":a_black_bottom_json},
-        {"id":9, "locatorCode": "009", "isEmpty":False, "materialList":a_white_bottom_json},
-        {"id":10, "locatorCode": "010", "isEmpty":False, "materialList":a_white_bottom_json},
+        {"id":7, "locatorCode": "007", "isEmpty":False, "materialList":a_white_bottom_json},
+        {"id":8, "locatorCode": "008", "isEmpty":False, "materialList":a_white_bottom_json},
+        {"id":9, "locatorCode": "009", "isEmpty":False, "materialList":a_black_bottom_json},
+        {"id":10, "locatorCode": "010", "isEmpty":False, "materialList":a_black_bottom_json},
         {"id":11, "locatorCode": "011", "isEmpty":False, "materialList":a_white_bottom_json},
         {"id":12, "locatorCode": "012", "isEmpty":False, "materialList":a_white_bottom_json},
 
-        {"id":13, "locatorCode": "013", "isEmpty":False, "materialList":a_black_middle_json},
-        {"id":14, "locatorCode": "014", "isEmpty":False, "materialList":a_black_middle_json},
-        {"id":15, "locatorCode": "015", "isEmpty":False, "materialList":a_white_middle_json},
-        {"id":16, "locatorCode": "016", "isEmpty":False, "materialList":a_white_middle_json},
+        {"id":13, "locatorCode": "013", "isEmpty":False, "materialList":a_white_middle_json},
+        {"id":14, "locatorCode": "014", "isEmpty":False, "materialList":a_white_middle_json},
+        {"id":15, "locatorCode": "015", "isEmpty":False, "materialList":a_black_middle_json},
+        {"id":16, "locatorCode": "016", "isEmpty":False, "materialList":a_black_middle_json},
         {"id":17, "locatorCode": "017", "isEmpty":False, "materialList":a_white_middle_json},
         {"id":18, "locatorCode": "018", "isEmpty":False, "materialList":a_white_middle_json},
 
-        {"id":19, "locatorCode": "019", "isEmpty":False, "materialList":a_black_up_json},
-        {"id":20, "locatorCode": "020", "isEmpty":False, "materialList":a_black_up_json},
-        {"id":21, "locatorCode": "021", "isEmpty":False, "materialList":a_white_up_json},
-        {"id":22, "locatorCode": "022", "isEmpty":False, "materialList":a_white_up_json},
-        {"id":23, "locatorCode": "023", "isEmpty":False, "materialList":a_pink_up_json},
-        {"id":24, "locatorCode": "024", "isEmpty":False, "materialList":a_pink_up_json},
+        {"id":19, "locatorCode": "019", "isEmpty":False, "materialList":a_white_up_json},
+        {"id":20, "locatorCode": "020", "isEmpty":False, "materialList":a_white_up_json},
+        {"id":21, "locatorCode": "021", "isEmpty":False, "materialList":a_black_up_json},
+        {"id":22, "locatorCode": "022", "isEmpty":False, "materialList":a_black_up_json},
+        {"id":23, "locatorCode": "023", "isEmpty":False, "materialList":a_grey_up_json},
+        {"id":24, "locatorCode": "024", "isEmpty":False, "materialList":a_grey_up_json},
 
         {"id":25, "locatorCode": "025", "isEmpty":False, "materialList":battery_json},
         {"id":26, "locatorCode": "026", "isEmpty":False, "materialList":battery_lid_json},
@@ -178,26 +166,26 @@ def generate_warehouse_info():
         {"id":31, "locatorCode": "031", "isEmpty":False, "materialList":box_json},
         {"id":32, "locatorCode": "032", "isEmpty":False, "materialList":box_json},
 
-        {"id":33, "locatorCode": "033", "isEmpty":False, "materialList":b_black_bottom_json},
-        {"id":34, "locatorCode": "034", "isEmpty":False, "materialList":b_black_bottom_json},
-        {"id":35, "locatorCode": "035", "isEmpty":False, "materialList":b_white_bottom_json},
-        {"id":36, "locatorCode": "036", "isEmpty":False, "materialList":b_white_bottom_json},
-        {"id":37, "locatorCode": "037", "isEmpty":False, "materialList":b_white_bottom_json},
-        {"id":38, "locatorCode": "038", "isEmpty":False, "materialList":b_white_bottom_json},
+        {"id":33, "locatorCode": "033", "isEmpty":False, "materialList":b_white_bottom_json},
+        {"id":34, "locatorCode": "034", "isEmpty":False, "materialList":b_white_bottom_json},
+        {"id":35, "locatorCode": "035", "isEmpty":False, "materialList":b_black_bottom_json},
+        {"id":36, "locatorCode": "036", "isEmpty":False, "materialList":b_black_bottom_json},
+        {"id":37, "locatorCode": "037", "isEmpty":False, "materialList":b_black_bottom_json},
+        {"id":38, "locatorCode": "038", "isEmpty":False, "materialList":b_black_bottom_json},
 
-        {"id":39, "locatorCode": "039", "isEmpty":False, "materialList":b_black_middle_json},
-        {"id":40, "locatorCode": "040", "isEmpty":False, "materialList":b_black_middle_json},
-        {"id":41, "locatorCode": "041", "isEmpty":False, "materialList":b_white_middle_json},
-        {"id":42, "locatorCode": "042", "isEmpty":False, "materialList":b_white_middle_json},
-        {"id":43, "locatorCode": "043", "isEmpty":False, "materialList":b_white_middle_json},
-        {"id":44, "locatorCode": "044", "isEmpty":False, "materialList":b_white_middle_json},
+        {"id":39, "locatorCode": "039", "isEmpty":False, "materialList":b_white_middle_json},
+        {"id":40, "locatorCode": "040", "isEmpty":False, "materialList":b_white_middle_json},
+        {"id":41, "locatorCode": "041", "isEmpty":False, "materialList":b_black_middle_json},
+        {"id":42, "locatorCode": "042", "isEmpty":False, "materialList":b_black_middle_json},
+        {"id":43, "locatorCode": "043", "isEmpty":False, "materialList":b_black_middle_json},
+        {"id":44, "locatorCode": "044", "isEmpty":False, "materialList":b_black_middle_json},
 
-        {"id":45, "locatorCode": "045", "isEmpty":False, "materialList":b_black_up_json},
-        {"id":46, "locatorCode": "046", "isEmpty":False, "materialList":b_black_up_json},
-        {"id":47, "locatorCode": "047", "isEmpty":False, "materialList":b_white_up_json},
-        {"id":48, "locatorCode": "048", "isEmpty":False, "materialList":b_white_up_json},
-        {"id":49, "locatorCode": "049", "isEmpty":False, "materialList":b_pink_up_json},
-        {"id":50, "locatorCode": "050", "isEmpty":False, "materialList":b_pink_up_json},
+        {"id":45, "locatorCode": "045", "isEmpty":False, "materialList":b_white_up_json},
+        {"id":46, "locatorCode": "046", "isEmpty":False, "materialList":b_white_up_json},
+        {"id":47, "locatorCode": "047", "isEmpty":False, "materialList":b_black_up_json},
+        {"id":48, "locatorCode": "048", "isEmpty":False, "materialList":b_black_up_json},
+        {"id":49, "locatorCode": "049", "isEmpty":False, "materialList":b_grey_up_json},
+        {"id":50, "locatorCode": "050", "isEmpty":False, "materialList":b_grey_up_json},
 
         {"id":51, "locatorCode": "051", "isEmpty":False, "materialList":battery_json},
         {"id":52, "locatorCode": "052", "isEmpty":False, "materialList":battery_lid_json},    
@@ -205,29 +193,29 @@ def generate_warehouse_info():
     print(warehouseValues)
     return warehouseValues
 
-
+# 立库初始化，全空
 def generate_warehouse_info_init():
     box_json = generate_plate_info_json(1,7,'null') 
 
     a_white_bottom_json = generate_plate_info_json(1,10,'null') 
     a_black_bottom_json = generate_plate_info_json(1,10,'null') 
-    a_pink_bottom_json = generate_plate_info_json(1,10,'null') 
+    a_grey_bottom_json = generate_plate_info_json(1,10,'null') 
     a_white_middle_json = generate_plate_info_json(1,10,'null') 
     a_black_middle_json = generate_plate_info_json(1,10,'null') 
-    a_pink_middle_json = generate_plate_info_json(1,10,'null') 
+    a_grey_middle_json = generate_plate_info_json(1,10,'null') 
     a_white_up_json = generate_plate_info_json(1,10,'null') 
     a_black_up_json = generate_plate_info_json(1,10,'null') 
-    a_pink_up_json = generate_plate_info_json(1,10,'null') 
+    a_grey_up_json = generate_plate_info_json(1,10,'null') 
 
     b_white_bottom_json = generate_plate_info_json(1,10,'null') 
     b_black_bottom_json = generate_plate_info_json(1,10,'null') 
-    b_pink_bottom_json = generate_plate_info_json(1,10,'null') 
+    b_grey_bottom_json = generate_plate_info_json(1,10,'null') 
     b_white_middle_json = generate_plate_info_json(1,10,'null') 
     b_black_middle_json = generate_plate_info_json(1,10,'null') 
-    b_pink_middle_json = generate_plate_info_json(1,10,'null') 
+    b_grey_middle_json = generate_plate_info_json(1,10,'null') 
     b_white_up_json = generate_plate_info_json(1,10,'null') 
     b_black_up_json = generate_plate_info_json(1,10,'null') 
-    b_pink_up_json = generate_plate_info_json(1,10,'null') 
+    b_grey_up_json = generate_plate_info_json(1,10,'null') 
 
     battery_json = generate_plate_info_json(1,55,'null')
 
@@ -246,26 +234,26 @@ def generate_warehouse_info_init():
         {"id":5, "locatorCode": "005", "isEmpty":True, "materialList":box_json},
         {"id":6, "locatorCode": "006", "isEmpty":True, "materialList":box_json},
 
-        {"id":7, "locatorCode": "007", "isEmpty":True, "materialList":a_black_bottom_json},
-        {"id":8, "locatorCode": "008", "isEmpty":True, "materialList":a_black_bottom_json},
-        {"id":9, "locatorCode": "009", "isEmpty":True, "materialList":a_white_bottom_json},
-        {"id":10, "locatorCode": "010", "isEmpty":True, "materialList":a_white_bottom_json},
+        {"id":7, "locatorCode": "007", "isEmpty":True, "materialList":a_white_bottom_json},
+        {"id":8, "locatorCode": "008", "isEmpty":True, "materialList":a_white_bottom_json},
+        {"id":9, "locatorCode": "009", "isEmpty":True, "materialList":a_black_bottom_json},
+        {"id":10, "locatorCode": "010", "isEmpty":True, "materialList":a_black_bottom_json},
         {"id":11, "locatorCode": "011", "isEmpty":True, "materialList":a_white_bottom_json},
         {"id":12, "locatorCode": "012", "isEmpty":True, "materialList":a_white_bottom_json},
 
-        {"id":13, "locatorCode": "013", "isEmpty":True, "materialList":a_black_middle_json},
-        {"id":14, "locatorCode": "014", "isEmpty":True, "materialList":a_black_middle_json},
-        {"id":15, "locatorCode": "015", "isEmpty":True, "materialList":a_white_middle_json},
-        {"id":16, "locatorCode": "016", "isEmpty":True, "materialList":a_white_middle_json},
+        {"id":13, "locatorCode": "013", "isEmpty":True, "materialList":a_white_middle_json},
+        {"id":14, "locatorCode": "014", "isEmpty":True, "materialList":a_white_middle_json},
+        {"id":15, "locatorCode": "015", "isEmpty":True, "materialList":a_black_middle_json},
+        {"id":16, "locatorCode": "016", "isEmpty":True, "materialList":a_black_middle_json},
         {"id":17, "locatorCode": "017", "isEmpty":True, "materialList":a_white_middle_json},
         {"id":18, "locatorCode": "018", "isEmpty":True, "materialList":a_white_middle_json},
 
-        {"id":19, "locatorCode": "019", "isEmpty":True, "materialList":a_black_up_json},
-        {"id":20, "locatorCode": "020", "isEmpty":True, "materialList":a_black_up_json},
-        {"id":21, "locatorCode": "021", "isEmpty":True, "materialList":a_white_up_json},
-        {"id":22, "locatorCode": "022", "isEmpty":True, "materialList":a_white_up_json},
-        {"id":23, "locatorCode": "023", "isEmpty":True, "materialList":a_pink_up_json},
-        {"id":24, "locatorCode": "024", "isEmpty":True, "materialList":a_pink_up_json},
+        {"id":19, "locatorCode": "019", "isEmpty":True, "materialList":a_white_up_json},
+        {"id":20, "locatorCode": "020", "isEmpty":True, "materialList":a_white_up_json},
+        {"id":21, "locatorCode": "021", "isEmpty":True, "materialList":a_black_up_json},
+        {"id":22, "locatorCode": "022", "isEmpty":True, "materialList":a_black_up_json},
+        {"id":23, "locatorCode": "023", "isEmpty":True, "materialList":a_grey_up_json},
+        {"id":24, "locatorCode": "024", "isEmpty":True, "materialList":a_grey_up_json},
 
         {"id":25, "locatorCode": "025", "isEmpty":True, "materialList":battery_json},
         {"id":26, "locatorCode": "026", "isEmpty":True, "materialList":battery_lid_json},
@@ -277,26 +265,26 @@ def generate_warehouse_info_init():
         {"id":31, "locatorCode": "031", "isEmpty":True, "materialList":box_json},
         {"id":32, "locatorCode": "032", "isEmpty":True, "materialList":box_json},
 
-        {"id":33, "locatorCode": "033", "isEmpty":True, "materialList":b_black_bottom_json},
-        {"id":34, "locatorCode": "034", "isEmpty":True, "materialList":b_black_bottom_json},
-        {"id":35, "locatorCode": "035", "isEmpty":True, "materialList":b_white_bottom_json},
-        {"id":36, "locatorCode": "036", "isEmpty":True, "materialList":b_white_bottom_json},
-        {"id":37, "locatorCode": "037", "isEmpty":True, "materialList":b_white_bottom_json},
-        {"id":38, "locatorCode": "038", "isEmpty":True, "materialList":b_white_bottom_json},
+        {"id":33, "locatorCode": "033", "isEmpty":True, "materialList":b_white_bottom_json},
+        {"id":34, "locatorCode": "034", "isEmpty":True, "materialList":b_white_bottom_json},
+        {"id":35, "locatorCode": "035", "isEmpty":True, "materialList":b_black_bottom_json},
+        {"id":36, "locatorCode": "036", "isEmpty":True, "materialList":b_black_bottom_json},
+        {"id":37, "locatorCode": "037", "isEmpty":True, "materialList":b_black_bottom_json},
+        {"id":38, "locatorCode": "038", "isEmpty":True, "materialList":b_black_bottom_json},
 
-        {"id":39, "locatorCode": "039", "isEmpty":True, "materialList":b_black_middle_json},
-        {"id":40, "locatorCode": "040", "isEmpty":True, "materialList":b_black_middle_json},
-        {"id":41, "locatorCode": "041", "isEmpty":True, "materialList":b_white_middle_json},
-        {"id":42, "locatorCode": "042", "isEmpty":True, "materialList":b_white_middle_json},
-        {"id":43, "locatorCode": "043", "isEmpty":True, "materialList":b_white_middle_json},
-        {"id":44, "locatorCode": "044", "isEmpty":True, "materialList":b_white_middle_json},
+        {"id":39, "locatorCode": "039", "isEmpty":True, "materialList":b_white_middle_json},
+        {"id":40, "locatorCode": "040", "isEmpty":True, "materialList":b_white_middle_json},
+        {"id":41, "locatorCode": "041", "isEmpty":True, "materialList":b_black_middle_json},
+        {"id":42, "locatorCode": "042", "isEmpty":True, "materialList":b_black_middle_json},
+        {"id":43, "locatorCode": "043", "isEmpty":True, "materialList":b_black_middle_json},
+        {"id":44, "locatorCode": "044", "isEmpty":True, "materialList":b_black_middle_json},
 
-        {"id":45, "locatorCode": "045", "isEmpty":True, "materialList":b_black_up_json},
-        {"id":46, "locatorCode": "046", "isEmpty":True, "materialList":b_black_up_json},
-        {"id":47, "locatorCode": "047", "isEmpty":True, "materialList":b_white_up_json},
-        {"id":48, "locatorCode": "048", "isEmpty":True, "materialList":b_white_up_json},
-        {"id":49, "locatorCode": "049", "isEmpty":True, "materialList":b_pink_up_json},
-        {"id":50, "locatorCode": "050", "isEmpty":True, "materialList":b_pink_up_json},
+        {"id":45, "locatorCode": "045", "isEmpty":True, "materialList":b_white_up_json},
+        {"id":46, "locatorCode": "046", "isEmpty":True, "materialList":b_white_up_json},
+        {"id":47, "locatorCode": "047", "isEmpty":True, "materialList":b_black_up_json},
+        {"id":48, "locatorCode": "048", "isEmpty":True, "materialList":b_black_up_json},
+        {"id":49, "locatorCode": "049", "isEmpty":True, "materialList":b_grey_up_json},
+        {"id":50, "locatorCode": "050", "isEmpty":True, "materialList":b_grey_up_json},
 
         {"id":51, "locatorCode": "051", "isEmpty":True, "materialList":battery_json},
         {"id":52, "locatorCode": "052", "isEmpty":True, "materialList":battery_lid_json},    
@@ -304,7 +292,7 @@ def generate_warehouse_info_init():
     print(warehouseValues)
     return warehouseValues
 
-
+# 模拟线边库全满时用
 def generate_line_storage_info():
     line_storage1_json = generate_plate_info_json(1,10,'Za01.01')
     line_storage2_json = generate_plate_info_json(1,10,'Za02.01')
@@ -324,7 +312,7 @@ def generate_line_storage_info():
     print(lineStorageValues)
     return lineStorageValues
 
-
+# 线边库初始化，全空
 def generate_line_storage_info_init():
     line_storage1_json = generate_plate_info_json(1,10,'null')
     line_storage2_json = generate_plate_info_json(1,10,'null')
@@ -344,7 +332,7 @@ def generate_line_storage_info_init():
     print(lineStorageValues)
     return lineStorageValues
 
-
+# 更新线边库时调用
 def generate_line_storage_info_null(lineStorageCode):
     if lineStorageCode == 1:
         line_storage_json = generate_plate_info_json(1,10,'null')
@@ -362,7 +350,7 @@ def generate_line_storage_info_null(lineStorageCode):
         print('generate_line_storage_info_null error!')
     return line_storage_json
 
-
+# 根据格位生成对应线编号
 def generate_linestorage_no(bin_id):
     if bin_id >= 1 and bin_id <= 6 or bin_id >= 27 and bin_id <= 32:
         # 包装盒
@@ -387,7 +375,7 @@ def generate_linestorage_no(bin_id):
 
     return line_no                      
 
-
+# 获取最新物料快照
 def get_material_dict():
     material_storage_uri = 'http://localhost:8088/v1/api/wms/material_storage'
     r = requests.get(material_storage_uri)
@@ -403,9 +391,8 @@ def get_material_dict():
     # print(material_dict)
     return material_dict
 
-
+# 更新立库物料库
 def generate_material_list_json(bin_id, start):
-    
     if bin_id >= 1 and bin_id <= 6 or bin_id >= 27 and bin_id <= 32:
         materialList = generate_plate_info_json(start, 7, 'Na01.01') 
     elif bin_id >= 7 and bin_id <= 8:
@@ -457,62 +444,8 @@ def generate_material_list_json(bin_id, start):
 
     return materialList
 
-
-def generate_unload_material_list_json(quantity, bin_id):
-    
-    if bin_id >= 1 and bin_id <= 6 or bin_id >= 27 and bin_id <= 32:
-        materialList = generate_unload_plate_info_json(quantity,7, 'Na01.01') 
-    elif bin_id >= 7 and bin_id <= 8:
-        materialList = generate_unload_plate_info_json(quantity,10, "Za01.01") 
-    elif bin_id >= 9 and bin_id <= 10:
-        materialList = generate_unload_plate_info_json(quantity,10, "Za01.02")
-    elif bin_id >= 11 and bin_id <= 12:
-        materialList = generate_unload_plate_info_json(quantity,10, "Za01.03")  
-    elif bin_id >= 13 and bin_id <= 14:
-        materialList = generate_unload_plate_info_json(quantity,10, "Za02.01") 
-    elif bin_id >= 15 and bin_id <= 16:
-        materialList = generate_unload_plate_info_json(quantity,10, "Za02.02")
-    elif bin_id >= 17 and bin_id <= 18:
-        materialList = generate_unload_plate_info_json(quantity,10, "Za02.03") 
-    elif bin_id >= 19 and bin_id <= 20:
-        materialList = generate_unload_plate_info_json(quantity,10, "Za03.01") 
-    elif bin_id >= 21 and bin_id <= 22:
-        materialList = generate_unload_plate_info_json(quantity,10, "Za03.02")
-    elif bin_id >= 23 and bin_id <= 24:
-        materialList = generate_unload_plate_info_json(quantity,10, "Za03.03")       
-    elif bin_id == 25 or bin_id == 51:
-        materialList = generate_unload_plate_info_json(quantity,55, 'Ba01.01') 
-    elif bin_id == 26 or bin_id == 52:
-        materialList = generate_unload_plate_info_json(quantity,53, 'Ba02.04') 
-
-    elif bin_id >= 33 and bin_id <= 34:
-        materialList = generate_unload_plate_info_json(quantity,10, "Za01.04") 
-    elif bin_id >= 35 and bin_id <= 36:
-        materialList = generate_unload_plate_info_json(quantity,10, "Za01.05")
-    elif bin_id >= 37 and bin_id <= 38:
-        materialList = generate_unload_plate_info_json(quantity,10, "Za01.06")  
-    elif bin_id >= 39 and bin_id <= 40:
-        materialList = generate_unload_plate_info_json(quantity,10, "Za01.04") 
-    elif bin_id >= 41 and bin_id <= 42:
-        materialList = generate_unload_plate_info_json(quantity,10, "Za01.05")
-    elif bin_id >= 43 and bin_id <= 44:
-        materialList = generate_unload_plate_info_json(quantity,10, "Za01.06") 
-    elif bin_id >= 45 and bin_id <= 46:
-        materialList = generate_unload_plate_info_json(quantity,10, "Za03.04") 
-    elif bin_id >= 47 and bin_id <= 48:
-        materialList = generate_unload_plate_info_json(quantity,10, "Za03.05")
-    elif bin_id >= 49 and bin_id <= 50:
-        materialList = generate_unload_plate_info_json(quantity,10, "Za03.06") 
-
-    else:
-        print('unknown!')
-
-    print(materialList)
-
-    return materialList
-
+# 生成立库格位空物料库
 def generate_null_material_list_json(bin_id):
-    
     if bin_id >= 1 and bin_id <= 6 or bin_id >= 27 and bin_id <= 32:
         materialList = generate_plate_info_json(1,7, 'null') 
     elif bin_id >= 7 and bin_id <= 8:
@@ -564,7 +497,7 @@ def generate_null_material_list_json(bin_id):
 
     return materialList
 
-
+# 生成出入立库版本
 def generate_warehouse_version_init():
 
     param = {'action': 'In',
@@ -576,6 +509,7 @@ def generate_warehouse_version_init():
     warehouse_version = [param,]
     return warehouse_version
 
+# 生成出入线边库版本
 def generate_linestorage_version_init():
     param = {'action': 'Out',
         'positionCode': 'LineStorage1',
@@ -584,6 +518,7 @@ def generate_linestorage_version_init():
     }          
     linestorage_version = [param,]
     return linestorage_version
+
 
 def bcd_to_int(x):
     """
@@ -664,51 +599,6 @@ def num2bcd(num):
     return bcd
 
 
-# def int2bitarray_8(int_, length):
-#     a=  bin(int_)
-#     b = a[2:]
-#     c= [i for i in b]
-#     if len(c) < length:
-#         c = extend_list(c, length)
-#     d = [True if i == '1' else False for i in c]
-#     e = d[::-1]
-
-#     return e
-
-# def int2bitarray_16(int_, length):
-#     a=  bin(int_)
-#     b = a[2:]
-#     c= [i for i in b]
-#     if len(c) < length:
-#         c = extend_list(c, length)
-#     d = [True if i == '1' else False for i in c]
-#     e = d[::-1]
-#     print(e)
-#     f = e[-8:].extend(e[0:8])
-#     print(f)
-#     return f 
-
-# def int2bitarray_32(int_, length):
-#     a=  bin(int_)
-#     b = a[2:]
-#     c= [i for i in b]
-#     if len(c) < length:
-#         c = extend_list(c, length)
-#     d = [True if i == '1' else False for i in c]
-#     e = d[::-1]
-#     f = e[-8:].extend(e[0:8])
-#     return f 
-
-
-
-
-
-# def extend_list(list_, length):
-#     d = ['0' for i in range(length-len(list_))]
-#     d.extend(list_)
-#     return d
-
-
 def int2bitarray(int_, length):
     try:
         a =int_
@@ -751,7 +641,6 @@ def int2bitarray(int_, length):
 
     except  Exception as e:
         pass
-        
 # def true_false_0_1(list_):
 #     return [True if i == 1 else False for i in list_]
 

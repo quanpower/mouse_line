@@ -10,7 +10,7 @@ import json
 import logging
 from utils import generate_plate_info_json, get_material_dict, \
     generate_material_list_json, generate_null_material_list_json, generate_linestorage_no, \
-        generate_unload_material_list_json, generate_line_storage_info_null
+        generate_line_storage_info_null
 
 logger = logging.getLogger(__name__)
 
@@ -84,7 +84,7 @@ def get_source_material_list(warehouse_url):
 
 
 # 更新立库储位为空
-def update_warehouse_null(warehouse_url,position):
+def update_warehouse_null(warehouse_url, position):
     material_list = generate_null_material_list_json(position)
     param = {'isEmpty': 1,
         'materialList': material_list
@@ -223,8 +223,8 @@ def in_action(siemens_1500, positionByte, position, enableByte, enableBit, enabl
             # elif goods == 5:
             #     # battery_lid
             #     material_list = generate_plate_info_json(1,53,material_code)
-
-            material_list = generate_material_list_json(position)
+            # todo:
+            material_list = generate_material_list_json(position, start)
 
             url = 'http://localhost:8088/v1/api/wms/warehouse/bin/' + str(position)
             param = {'isEmpty': 0,
