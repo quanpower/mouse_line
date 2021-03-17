@@ -185,12 +185,15 @@ class MyTCPHandler(StreamRequestHandler):
         print(self.ip+":"+str(self.port)+"连接到服务器！")  
 
     def handle(self):  #所有请求的交互都是在handle里执行的,
-        print(self.request)
-        print(self.client_address[0])
-        client_address = self.client_address[0].strip()  
-        print(client_address)
-        gloVar.sockets[client_address] = self.request
-        print(gloVar.sockets)
+        try:
+            print(self.request)
+            print(self.client_address[0])
+            client_address = self.client_address[0].strip()  
+            print(client_address)
+            gloVar.sockets[client_address] = self.request
+            print(gloVar.sockets)
+        except Exception as e:
+            print(e)
 
         global isNew
         while True:
@@ -375,6 +378,7 @@ class MyTCPHandler(StreamRequestHandler):
                                 if position:
                                     thread_in = threading.Thread(name="thread_in", target=in_action, args=(siemens_1500, positionByte, position, enableByte, enableBit, enable, goods, glock))
                                     thread_in.start()                                      
+                    
                     else:
                         print('unhandled!')
                         print(data_tuple)
@@ -403,6 +407,7 @@ if __name__ == "__main__":
         # 连接PLC
         thread_plcConn.start()
         time.sleep(5)
+
         # 循环读取PLC及机器人状态
         thread_statusRead_0.start()
 
