@@ -312,6 +312,39 @@ def generate_line_storage_info():
     print(lineStorageValues)
     return lineStorageValues
 
+
+# 生产时更新线边库用
+def generate_update_assembly_line_storage_info(lineStorageCode, quantity):
+    if lineStorageCode == 1:
+        line_storage_json = generate_plate_info_json(quantity,10,'Za01.01')
+    elif lineStorageCode == 2:
+        line_storage_json = generate_plate_info_json(quantity,10,'Za02.01')
+    elif lineStorageCode == 3:
+        line_storage_json = generate_plate_info_json(quantity,10,'Za03.01')
+    elif lineStorageCode == 4:
+        line_storage_json = generate_plate_info_json(quantity,55,'Ba01.01')
+    elif lineStorageCode == 5:
+        line_storage_json = generate_plate_info_json(quantity,53,'Ba02.01')
+    elif lineStorageCode == 6:
+        line_storage_json = generate_plate_info_json(quantity,7,'Na01.01')
+    else:
+        print('generate_line_storage_info_null error!')
+    return line_storage_json
+
+
+
+    lineStorageValues = [
+        {"id":1, "lineStorageCode": "LineStorage1", "isEmpty":False, "materialList":line_storage1_json},
+        {"id":2, "lineStorageCode": "LineStorage2", "isEmpty":False, "materialList":line_storage2_json},
+        {"id":3, "lineStorageCode": "LineStorage3", "isEmpty":False, "materialList":line_storage3_json},
+        {"id":4, "lineStorageCode": "LineStorage4", "isEmpty":False, "materialList":line_storage4_json},
+        {"id":5, "lineStorageCode": "LineStorage5", "isEmpty":False, "materialList":line_storage5_json},
+        {"id":6, "lineStorageCode": "LineStorage6", "isEmpty":False, "materialList":line_storage6_json},   
+    ]
+    print(lineStorageValues)
+    return lineStorageValues
+    
+
 # 线边库初始化，全空
 def generate_line_storage_info_init():
     line_storage1_json = generate_plate_info_json(1,10,'null')

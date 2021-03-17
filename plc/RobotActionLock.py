@@ -10,7 +10,7 @@ import json
 import logging
 from utils import generate_plate_info_json, get_material_dict, \
     generate_material_list_json, generate_null_material_list_json, generate_linestorage_no, \
-        generate_line_storage_info_null
+        generate_line_storage_info_null, generate_update_assembly_line_storage_info
 
 logger = logging.getLogger(__name__)
 
@@ -434,14 +434,10 @@ def unload_action(siemens_1500, line_no, positionByte, enableByte, enableBit, en
     print('---unload action---end-------')     
 
 # 生产动作流程
-def produce_action(siemens_1500, line_no, positionByte, enableByte, enableBit, enable, glock):
+def update_assembly_action(siemens_1500, line_no, quantity, glock):
     logger.info('---produce action----start-----')
     logger.info(datetime.datetime.now())
     print('---produce action----start-----')
-    # with glock:
-    #     siemens_1500.write_int_to_plc(38, positionByte, position)
-    #     time.sleep(0.1)
-    #     siemens_1500.write_bool_to_plc(38, enableByte, enableBit, enable)
 
     i = 0
 
@@ -460,48 +456,23 @@ def produce_action(siemens_1500, line_no, positionByte, enableByte, enableBit, e
     logger.info(source_material_list)   
     
     # 2.更新线边库
-    nullMaterialList = generate_line_storage_info_null(line_no)
-    param = {'isEmpty': 1,
-    'materialList': nullMaterialList,
-    'source': 0
+    update_assembly_MaterialList = generate_update_assembly_line_storage_info(line_no, quantity)
+    param = {'isEmpty': 0,
+    'materialList': update_assembly_MaterialList,
+    'source': source
     }
     payload = json.dumps(param)
-    logger.info('====line_storage_info_null_payload====')
+    logger.info('====line_storage_info_produce_payload====')
     logger.info(payload)
     response_put = requests.put(line_storage_url, data=payload)
-    logger.info('line_storage_info_null response_put')
+    logger.info('line_storage_info_produce response_put')
     logger.info(response_put.json())
+
     # 3.创建linestorage outandin版本库
-    create_new_line_storage_version('Out', 'LineStorage'+str(line_no), source_material_list)
+    # create_new_line_storage_version('Out', 'LineStorage'+str(line_no), source_material_list)
 
     # 4.POST MES
-    post_mes_line_storage()
-
-    while True:
-        # 放件完成，更新入库
-        if gloVar.warehouse_put_ok:
-            # 1.更新立库
-            url = 'http://localhost:8088/v1/api/wms/warehouse/bin/' + str(source)
-            param = {'isEmpty': 0,
-            'materialList': source_material_list
-            }
-            payload = json.dumps(param)
-            response_put = requests.put(url, data=payload)
-            #2. 创建新warehouse outandin版本
-            create_new_warehouse_version('In', '0'+str(source), source_material_list)
-            # 3.POST MES
-            post_mes_warehouse()
-            # 4.退出下料流程
-            break
-        
-        i += 1
-        # logger.info('unload_action i')
-        # logger.info(i)
-
-        # 跳出while,结束入库
-        if i >= 600:
-            return
-        time.sleep(0.2)   
+    # post_mes_line_storage()
 
     logger.info('---produce action---end-------')
     print('---produce action---end-------')     

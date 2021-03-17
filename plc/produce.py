@@ -6,7 +6,7 @@ import datetime
 
 import operator
 import threading 
-from RobotActionLock import in_action, out_action, load_action, unload_action
+from RobotActionLock import in_action, out_action, load_action, unload_action, update_assembly_action
 from utils import get_material_dict
 import logging
 from laser_client import client_send
@@ -250,13 +250,13 @@ def pre_unload(siemens_1500, line_no, glock):
     thread_unload = threading.Thread(name="thread_unload", target=unload_action, args=(siemens_1500, line_no, positionByte,  enableByte, enableBit, enable, glock))
     thread_unload.start()
 
-def pre_update_assembly_line(siemens_1500, line_no, glock):
+def pre_update_assembly_line(siemens_1500, line_no, quantity, glock):
     positionByte = 2
     enableByte = 1
     enableBit = 0
     enable = 1
-    thread_unload = threading.Thread(name="thread_unload", target=unload_action, args=(siemens_1500, line_no, positionByte,  enableByte, enableBit, enable, glock))
-    thread_unload.start()
+    thread_update_assembly = threading.Thread(name="thread_update_assembly", target=update_assembly_action, args=(siemens_1500, line_no, quantity, glock))
+    thread_update_assembly.start()
 
 
 def pre_in():
@@ -320,11 +320,21 @@ def produce_trigger(glock):
     while True:
         # 下料触发，有任意一个工位托盘取件完成
         if any(gloVar.producing_bool_get_ok_list):
-            line_no = gloVar.producing_bool_get_ok_list.index(True) + 1
-            index = gloVar.producing_bool_get_ok_list.index(True)
-            quantity = gloVar.producing_quanlity_list[index]
             
+            index = gloVar.producing_bool_get_ok_list.index(True)
+            line_no = index + 1
+
+            if index == 4 or index == 5:
+                line_no =  5
+                quantity = gloVar.producing_quanlity_list[4]
+            elif index == 6:
+                line_no = 6
+                quantity = gloVar.producing_quanlity_list[5]
+            else:
+                line_no = index + 1
+                quantity =  gloVar.producing_quanlity_list[index]
+
             logger.info('=====pre_update_assembly_line trigger=====')
             logger.info(line_no)
-            pre_update_assembly_line(siemens_1500, line_no, glock)
+            pre_update_assembly_line(siemens_1500, line_no, quantity, glock)
         time.sleep(0.5)

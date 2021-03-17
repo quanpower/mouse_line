@@ -123,11 +123,9 @@ def query_system_status(glock):
                     r3_middle_plate = rs[9]
                     r3_top_plate = rs[10]
                     r4_battery_plate = rs[11]
-                    r4_black_lid_plate = rs[12]
-                    r4_white_lid_plate = rs[13]
-                    r6_plate = rs[14]
-                    r7_box_plate = rs[15]
-                    producing_quanlity_list = [r2_bottom_plate, r3_middle_plate, r3_top_plate, r4_battery_plate, r4_black_lid_plate, r4_white_lid_plate, r7_box_plate]
+                    r4_battery_lid_plate = rs[12]
+                    r7_box_plate = rs[13]
+                    producing_quanlity_list = [r2_bottom_plate, r3_middle_plate, r3_top_plate, r4_battery_plate, r4_battery_lid_plate, r7_box_plate]
                     
                     #####################################----------------更新全局变量----------------############################################
                     gloVar.warehouse_senser_status = wss
@@ -153,6 +151,7 @@ def query_system_status(glock):
 
                     # 生产取料完成
                     gloVar.producing_bool_get_ok_list = producing_bool_get_ok_list
+                    # 生产线工位上托盘内器件数量
                     gloVar.producing_quanlity_list = producing_quanlity_list
                     
                     # 订单完成
