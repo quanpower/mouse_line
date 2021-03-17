@@ -20,6 +20,7 @@ def query_system_status(glock):
             with glock:
                 try:
                     # print('=====robot_0======')
+                    ###########################################--------DB40----------###########################################
                     # 立库52格位有无信号
                     warehouse_senser_status = siemens_1500.query_block_from_plc(40,0,8)
                     wss =struct.unpack('<2I', warehouse_senser_status)
@@ -38,8 +39,11 @@ def query_system_status(glock):
                     rpgds_array_1 = int2bitarray(rpgds[1], 8)
                     rpgds_array_2 = int2bitarray(rpgds[2], 8)
 
+                    # 立库取件完成
                     warehouse_get_ok = rpgds_array_0[4]
+                    # 立库放件完成
                     warehouse_put_ok = rpgds_array_0[5]
+
                     z2_get_ok = rpgds_array_0[6]
                     z2_put_ok = rpgds_array_0[7]
 
@@ -54,21 +58,43 @@ def query_system_status(glock):
 
                     z7_get_ok = rpgds_array_2[0]
                     z7_put_ok = rpgds_array_2[1]  
-
+                    
+                    # 从线边库取件完成
                     line_get_ok_list = [z2_get_ok, z3_get_ok, z4_get_ok, z5_get_ok, z6_get_ok, z7_get_ok]
+                    # 往线边库放件完成
                     line_put_ok_list = [z2_put_ok, z3_put_ok, z4_put_ok, z5_put_ok, z6_put_ok, z7_put_ok]
-
+                    # 此单完成信号
                     work_done = rpgds_array_2[2]
+                    # 预生产信号
                     pre_order_ok = rpgds_array_2[3]
 
-                    # 相机触发
+                    # 生产过程种取件完成，更新线边库
+                    producing_get_ok = siemens_1500.query_block_from_plc(40,11,1)
+                    producing_get_ok_list = struct.unpack('>B', producing_get_ok)
+                    # print(producing_get_ok_list)
+                    producing_get_ok_array = int2bitarray(producing_get_ok_list[0], 8)
+                    z2_bottom_get_ok = producing_get_ok_array[0]
+                    z3_middle_get_ok = producing_get_ok_array[1]
+                    z3_top_get_ok = producing_get_ok_array[2]
+                    z4_battery_get_ok = producing_get_ok_array[3]           
+                    z4_black_lid_get_ok = producing_get_ok_array[4]
+                    z4_white_lid_get_ok = producing_get_ok_array[5]
+                    z7_box_get_ok = producing_get_ok_array[6]
+
+                    producing_bool_get_ok_list =[z2_bottom_get_ok, z3_middle_get_ok, z3_top_get_ok, z4_battery_get_ok, z4_black_lid_get_ok, z4_white_lid_get_ok, z7_box_get_ok]
+
+
+                    #######################################--------DB38----------###########################################
+                    ###########-----------相机触发-------------##############
                     camera_trigger = siemens_1500.query_block_from_plc(38,0,1)
                     ct =struct.unpack('>B', camera_trigger)
                     # print('===camera_trigger===')
                     camera_triggers = int2bitarray(ct[0], 8)
                     # print(camera_triggers)
-                    # 准备完成,上料使能
+
+                    # 堆垛机准备完成,准备从立库取件
                     ready_ok = camera_triggers[7]
+
 
                     # 托盘检测
                     plate_check = siemens_1500.query_block_from_plc(38,5,1)
@@ -77,11 +103,13 @@ def query_system_status(glock):
                     plate_check_list = int2bitarray(pc[0], 8)
                     # print(plate_check_list)
 
+                    # -->线边库，上料
                     robot_status = siemens_1500.query_block_from_plc(38,16,28)
                     rs =struct.unpack('>14H', robot_status)
                     # print(rs)
                     gripper = rs[0]
-
+                    
+                    # 各工位检测有无托盘 
                     z2 = rs[1]
                     z3_1 = rs[2]
                     z3_2 = rs[3]
@@ -90,19 +118,32 @@ def query_system_status(glock):
                     z5 = rs[6]
                     z6 = rs[7]
 
-                    r2_plate = rs[8]
-                    r3_plate_1 = rs[9]
-                    r3_plate_2 = rs[10]
-                    r4_plate_1 = rs[11]
-                    r4_plate_2 = rs[12]
-                    r7_plate = rs[13]
-
+                    # 各工位托盘内器件数量
+                    r2_bottom_plate = rs[8]
+                    r3_middle_plate = rs[9]
+                    r3_top_plate = rs[10]
+                    r4_battery_plate = rs[11]
+                    r4_black_lid_plate = rs[12]
+                    r4_white_lid_plate = rs[13]
+                    r6_plate = rs[14]
+                    r7_box_plate = rs[15]
+                    producing_quanlity_list = [r2_bottom_plate, r3_middle_plate, r3_top_plate, r4_battery_plate, r4_black_lid_plate, r4_white_lid_plate, r7_box_plate]
+                    
+                    #####################################----------------更新全局变量----------------############################################
                     gloVar.warehouse_senser_status = wss
                     gloVar.camera_triggers = camera_triggers
                     gloVar.robot_status = rs
-
+                    
+                    # 立库传感器判断
                     gloVar.wssArray = wssArray
+                    
+                    # 新订单准备完成
+                    gloVar.pre_order_ok = pre_order_ok
 
+                    # 堆垛机准备完成
+                    gloVar.ready_ok = ready_ok
+                    
+                    # 上下料取放件完成
                     gloVar.warehouse_get_ok = warehouse_get_ok
                     gloVar.warehouse_put_ok = warehouse_put_ok
 
@@ -110,15 +151,16 @@ def query_system_status(glock):
                     gloVar.line_put_ok_list = line_put_ok_list
                     gloVar.plate_check_list = plate_check_list
 
-                    gloVar.ready_ok = ready_ok
-
+                    # 生产取料完成
+                    gloVar.producing_bool_get_ok_list = producing_bool_get_ok_list
+                    gloVar.producing_quanlity_list = producing_quanlity_list
+                    
+                    # 订单完成
                     gloVar.work_done = work_done
                     # 不生产时，把状态设为完成
                     if work_done:
                         gloVar.state = 3
                         
-                    gloVar.pre_order_ok = pre_order_ok
-
                     # logger.info('\n'*3)
                     # logger.info('=====warehouse_senser_status======')
                     # logger.info('====wssArray===')

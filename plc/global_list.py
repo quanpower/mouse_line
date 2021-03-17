@@ -14,14 +14,16 @@ class gloVar():
     camera_triggers = [0,0,0,0,0,0,0,0]
     robot_status = []
     wssArray = []
+    
+    pre_order_ok = False
     ready_ok = False
     warehouse_get_ok = False
     warehouse_put_ok = False
     line_get_ok_list = []
     line_put_ok_list = []
     plate_check_list = []
+    producing_bool_get_ok_list = []
     work_done = False
-    pre_order_ok = False
     
     ua_order_list = []
     

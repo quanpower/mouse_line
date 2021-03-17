@@ -132,3 +132,9 @@ dmypy.json
 wms/node_modules/
 wms/__pycache__/
 wms/templates/node_modules/
+
+opcua/
+laser/
+
+*.docx
+*.xlsx

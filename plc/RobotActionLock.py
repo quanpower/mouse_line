@@ -15,7 +15,6 @@ from utils import generate_plate_info_json, get_material_dict, \
 logger = logging.getLogger(__name__)
 
 
-
 mes_warehouse_snapshot_url ="http://172.16.1.62/aim-mes/open-api/wms/snapshot/v1/list"
 mes_line_storage_snapshot_url ="http://172.16.1.62/aim-mes/open-api/wms-line/snapshot/v1/list"
 
@@ -202,28 +201,6 @@ def in_action(siemens_1500, positionByte, position, enableByte, enableBit, enabl
         if gloVar.warehouse_put_ok:
             # 放件完成，更新入库
 
-            # material_code = get_material_code(position)
-            # print(material_code)
-
-            # if goods == 6:
-            #     # box
-            #     material_list = generate_plate_info_json(1,7,material_code)
-            # elif goods == 3:
-            #     # bottom
-            #     material_list = generate_plate_info_json(1,10,material_code)
-            # elif goods == 2:
-            #     # middle
-            #     material_list = generate_plate_info_json(1,10,material_code)
-            # elif goods == 1:
-            #     # up
-            #     material_list = generate_plate_info_json(1,10,material_code)
-            # elif goods == 4:
-            #     # battery
-            #     material_list = generate_plate_info_json(1,55,material_code)
-            # elif goods == 5:
-            #     # battery_lid
-            #     material_list = generate_plate_info_json(1,53,material_code)
-            
             # 入库，默认从第一个开始，满盘
             material_list = generate_material_list_json(position, 1)
 
@@ -393,7 +370,6 @@ def unload_action(siemens_1500, line_no, positionByte, enableByte, enableBit, en
     #     time.sleep(0.1)
     #     siemens_1500.write_bool_to_plc(38, enableByte, enableBit, enable)
 
-
     i = 0
 
     # 1.获取线边库托盘信息
@@ -456,3 +432,76 @@ def unload_action(siemens_1500, line_no, positionByte, enableByte, enableBit, en
 
     logger.info('---unload action---end-------')
     print('---unload action---end-------')     
+
+# 生产动作流程
+def produce_action(siemens_1500, line_no, positionByte, enableByte, enableBit, enable, glock):
+    logger.info('---produce action----start-----')
+    logger.info(datetime.datetime.now())
+    print('---produce action----start-----')
+    # with glock:
+    #     siemens_1500.write_int_to_plc(38, positionByte, position)
+    #     time.sleep(0.1)
+    #     siemens_1500.write_bool_to_plc(38, enableByte, enableBit, enable)
+
+    i = 0
+
+    # 1.获取线边库托盘信息
+    line_storage_url = line_storage_bin_url + str(line_no)
+    r = requests.get(line_storage_url)
+    return_json = r.json()
+    line_storage_bin = return_json['data']
+    # print(line_storage_bin)
+    source_material_list = line_storage_bin[0]['materialList']
+    source = line_storage_bin[0]['source']
+
+    logger.info('source is:')
+    logger.info(source)
+    logger.info('materialList is:')
+    logger.info(source_material_list)   
+    
+    # 2.更新线边库
+    nullMaterialList = generate_line_storage_info_null(line_no)
+    param = {'isEmpty': 1,
+    'materialList': nullMaterialList,
+    'source': 0
+    }
+    payload = json.dumps(param)
+    logger.info('====line_storage_info_null_payload====')
+    logger.info(payload)
+    response_put = requests.put(line_storage_url, data=payload)
+    logger.info('line_storage_info_null response_put')
+    logger.info(response_put.json())
+    # 3.创建linestorage outandin版本库
+    create_new_line_storage_version('Out', 'LineStorage'+str(line_no), source_material_list)
+
+    # 4.POST MES
+    post_mes_line_storage()
+
+    while True:
+        # 放件完成，更新入库
+        if gloVar.warehouse_put_ok:
+            # 1.更新立库
+            url = 'http://localhost:8088/v1/api/wms/warehouse/bin/' + str(source)
+            param = {'isEmpty': 0,
+            'materialList': source_material_list
+            }
+            payload = json.dumps(param)
+            response_put = requests.put(url, data=payload)
+            #2. 创建新warehouse outandin版本
+            create_new_warehouse_version('In', '0'+str(source), source_material_list)
+            # 3.POST MES
+            post_mes_warehouse()
+            # 4.退出下料流程
+            break
+        
+        i += 1
+        # logger.info('unload_action i')
+        # logger.info(i)
+
+        # 跳出while,结束入库
+        if i >= 600:
+            return
+        time.sleep(0.2)   
+
+    logger.info('---produce action---end-------')
+    print('---produce action---end-------')     

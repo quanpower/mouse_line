@@ -108,6 +108,8 @@ def camera_trigger():
         camera_triggers = gloVar.camera_triggers
         # print('=====camera_triggers====')
         # print(camera_triggers)
+        
+        # 人工上料台到立库->入库触发
         if camera_triggers[0]:
             thread_trigger = threading.Thread(name="thread_trigger", target=trigger_warehouse_camara, args=(camera1_ip,))
             thread_trigger.start()

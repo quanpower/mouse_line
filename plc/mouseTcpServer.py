@@ -343,24 +343,21 @@ class MyTCPHandler(StreamRequestHandler):
 
                         elif datalist_length >8 :
                             # 1号相机上料测量电池盖
+                            print('===b_ ====')
                             b_quantity = int(datalist[0])
                             b_color = int(datalist[1])
                             b_category = int(datalist[2])
                             b_ng = int(datalist[3])
-                            print('===b_ ====')
-                            print(type(b_))
                             b_goods = int(datalist[4])
 
-
+                            print('===w_ ====')
                             w_quantity = int(datalist[5])
                             w_color = int(datalist[6])
                             w_category = int(datalist[7])
                             w_ng = int(datalist[8])
-                            print('===w_ ====')
-                            print(type(w_))
                             w_goods = int(datalist[9])
-                            print('=======camera1========')
 
+                            print('=======camera1========')
 
                             if b_ng == 1 and  w_ng == 1:
                             # if 1:

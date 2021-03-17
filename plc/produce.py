@@ -95,7 +95,7 @@ def send_sign_to_laser(productCode, signType, signValue):
     elif signType == 1:
         print('==text to laser!===')
         '''A:GDM1=ABC123*GDM2=123ABC*JPG=D:\PLT\tongjian.jpg'''
-        data = productCode[:1]+':GDM1=' + signValue
+        data = productCode[:1]+':GDM1=' + signValue + '*JPG='
         print(data)
         logger.info('====text to laser!===')
         logger.info(data)
@@ -116,7 +116,7 @@ def send_sign_to_laser(productCode, signType, signValue):
                 f.write(img)
 
             # 图片发A1:JPG=****
-            data = productCode[:1]+ "1:JPG=" + file_path
+            data = productCode[:1]+':GDM1='+ "*JPG=" + file_path
             logger.info('====jpeg to laser!===')
             logger.info(data)        
             thread_laser = threading.Thread(name="thread_laser", target=client_send, args=(data,))
@@ -224,10 +224,12 @@ def pre_load(order_list, siemens_1500, glock):
 
     positions = generate_positions(order_list)
     out_list = generate_out_list(warehouse_bin_uri, positions)
-
+    
+    # 上料位置
     positionByte = 6
     noByte = 94
     quantityByte = 96
+    # 上料使能
     enableByte = 4
     enableBit = 0
     enable = 1
@@ -248,6 +250,14 @@ def pre_unload(siemens_1500, line_no, glock):
     thread_unload = threading.Thread(name="thread_unload", target=unload_action, args=(siemens_1500, line_no, positionByte,  enableByte, enableBit, enable, glock))
     thread_unload.start()
 
+def pre_update_assembly_line(siemens_1500, line_no, glock):
+    positionByte = 2
+    enableByte = 1
+    enableBit = 0
+    enable = 1
+    thread_unload = threading.Thread(name="thread_unload", target=unload_action, args=(siemens_1500, line_no, positionByte,  enableByte, enableBit, enable, glock))
+    thread_unload.start()
+
 
 def pre_in():
     pass
@@ -256,7 +266,7 @@ def pre_in():
 def pre_out():
     pass
 
-
+# 上料触发，由MES订单触发
 def load_trigger(glock):
     siemens_1500 =  gloVar.siemens_1500
 
@@ -266,25 +276,27 @@ def load_trigger(glock):
         order_list = get_order_list()
         # 有新订单时
         if order_list:
+            # 且新订单生产准备完成
             if gloVar.pre_order_ok:
                 print('===load_trigger===')
                 logger.info('===load_trigger===')
                 pre_load(order_list, siemens_1500, glock)
         time.sleep(10)
 
-
+# 下料触发，由机器人取工位托盘完成信号触发
 def unload_trigger(glock):
     siemens_1500 =  gloVar.siemens_1500
 
     while True:
+        # 下料触发，有任意一个工位托盘取件完成
         if any(gloVar.line_get_ok_list):
             line_no = gloVar.line_get_ok_list.index(True) + 1
             logger.info('=====unload_trigger  line_no=====')
             logger.info(line_no)
             pre_unload(siemens_1500, line_no, glock)
         time.sleep(0.5)
-
-
+# TODO：
+# 出库触发，立库内有托盘为空触发
 def out_trigger(glock):
     siemens_1500 =  gloVar.siemens_1500
     while True:
@@ -293,10 +305,26 @@ def out_trigger(glock):
             pre_out()
         time.sleep(1)
 
-
+# 入库触发，相机拍照OK触发，暂时不需要，因为手动上料触发
 def in_trigger(glock):
     siemens_1500 =  gloVar.siemens_1500
     while True:
         if False :
             pre_in()
         time.sleep(1)
+
+# 生产触发，准备更新托盘内数量
+def produce_trigger(glock):
+    siemens_1500 =  gloVar.siemens_1500
+
+    while True:
+        # 下料触发，有任意一个工位托盘取件完成
+        if any(gloVar.producing_bool_get_ok_list):
+            line_no = gloVar.producing_bool_get_ok_list.index(True) + 1
+            index = gloVar.producing_bool_get_ok_list.index(True)
+            quantity = gloVar.producing_quanlity_list[index]
+            
+            logger.info('=====pre_update_assembly_line trigger=====')
+            logger.info(line_no)
+            pre_update_assembly_line(siemens_1500, line_no, glock)
+        time.sleep(0.5)
