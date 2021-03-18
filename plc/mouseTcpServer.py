@@ -73,6 +73,7 @@ materials_position = {
 }
 
 
+
 logging.basicConfig(
     # 日志级别,logging.DEBUG,logging.ERROR
     # level = logging.WARNING,  
@@ -89,16 +90,17 @@ logging.basicConfig(
 )
 
 
-def logger(log_obj):
+def main_logger(log_obj):
     logger = logging.getLogger(log_obj)
     logger.setLevel(logging.INFO)
     console_handle = logging.StreamHandler()
+    
     log_file = "access.log"
-    file_handle = logging.FileHandler(log_file)
+    file_handle = logging.FileHmain_loggerandler(log_file)
     file_handle.setLevel(logging.WARNING)
 
     formatter = logging.Formatter(
-        '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        '%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s')
 
     console_handle.setFormatter(formatter)
     file_handle.setFormatter(formatter)
@@ -395,7 +397,8 @@ class MyTCPHandler(StreamRequestHandler):
 
 if __name__ == "__main__":
 
-    logger = logging.getLogger(__name__)
+    # logger = logging.getLogger(__name__)
+    logger = main_logger(__name__)
 
     try:
         logger.info('registered user, welcome to use!')

@@ -3,13 +3,16 @@ import datetime
 import time
 from global_list import gloVar
 import sys
+from opcua import ua, Server
+
 sys.path.insert(0, "..")
 
+# module_logger = logging.getLogger("mouseTcpServer.sub")
 # logger = logging.getLogger(__name__)
-logger = logging.getLogger('uaServer')
-logger.setLevel(logging.DEBUG)
+# logger = logging.getLogger('uaServer')
+logger = logging.getLogger("mouseTcpServer.uaServer")
 
-from opcua import ua, Server
+logger.setLevel(logging.DEBUG)
 
 def ua_main():
     # setup our server
