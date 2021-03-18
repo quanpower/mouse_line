@@ -7,6 +7,7 @@ sys.path.insert(0, "..")
 
 # logger = logging.getLogger(__name__)
 logger = logging.getLogger('uaServer')
+logger.setLevel(logging.DEBUG)
 
 from opcua import ua, Server
 
