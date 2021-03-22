@@ -96,7 +96,7 @@ def main_logger(log_obj):
     console_handle = logging.StreamHandler()
     
     log_file = "access.log"
-    file_handle = logging.FileHmain_loggerandler(log_file)
+    file_handle = logging.FileHandler(log_file)
     file_handle.setLevel(logging.WARNING)
 
     formatter = logging.Formatter(
