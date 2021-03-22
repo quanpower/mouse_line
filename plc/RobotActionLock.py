@@ -446,7 +446,7 @@ def update_assembly_action(siemens_1500, line_no, quantity, glock):
     r = requests.get(line_storage_url)
     return_json = r.json()
     line_storage_bin = return_json['data']
-    # print(line_storage_bin)
+    print(line_storage_bin)
     source_material_list = line_storage_bin[0]['materialList']
     source = line_storage_bin[0]['source']
 
@@ -454,6 +454,9 @@ def update_assembly_action(siemens_1500, line_no, quantity, glock):
     logger.info(source)
     logger.info('materialList is:')
     logger.info(source_material_list)   
+
+    print(source)
+    print(source_material_list)
     
     # 2.更新线边库
     update_assembly_MaterialList = generate_update_assembly_line_storage_info(line_no, quantity)
@@ -467,6 +470,7 @@ def update_assembly_action(siemens_1500, line_no, quantity, glock):
     response_put = requests.put(line_storage_url, data=payload)
     logger.info('line_storage_info_produce response_put')
     logger.info(response_put.json())
+    print(response_put.json())
 
     # 3.创建linestorage outandin版本库
     # create_new_line_storage_version('Out', 'LineStorage'+str(line_no), source_material_list)

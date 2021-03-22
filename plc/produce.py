@@ -336,5 +336,8 @@ def produce_trigger(glock):
 
             logger.info('=====pre_update_assembly_line trigger=====')
             logger.info(line_no)
+
+            print('=====pre_update_assembly_line trigger=====')
+            print(line_no)
             pre_update_assembly_line(siemens_1500, line_no, quantity, glock)
         time.sleep(0.5)
