@@ -178,7 +178,7 @@ class MyTCPHandler(StreamRequestHandler):
 
     ip = ""  
     port = 0  
-    timeOut = 180     # 设置超时时间变量 
+    timeOut = 1800     # 设置超时时间变量 
 
     def setup(self):  
         self.ip = self.client_address[0].strip()     # 获取客户端的ip  

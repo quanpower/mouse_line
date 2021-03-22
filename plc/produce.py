@@ -319,6 +319,8 @@ def produce_trigger(glock):
 
     while True:
         # 下料触发，有任意一个工位托盘取件完成
+        print("======gloVar.producing_bool_get_ok_list=====")
+        print(gloVar.producing_bool_get_ok_list)
         if any(gloVar.producing_bool_get_ok_list):
             
             index = gloVar.producing_bool_get_ok_list.index(True)
